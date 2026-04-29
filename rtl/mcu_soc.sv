@@ -238,7 +238,7 @@ module mcu_soc import mcu_soc_pkg::*; #(
     .mgr_port_obi_rsp_t (obi_rsp_t),
     .NumSbrPorts        (NumManagers),
     .NumMgrPorts        (NumSubordinates),
-    .NumMaxTrans        (6),
+    .NumMaxTrans        (4),
     .NumAddrRules       (NumSubordinates),
     .addr_map_rule_t    (addr_map_rule_t),
     .UseIdForRouting    (1'b0),
