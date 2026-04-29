@@ -2,8 +2,8 @@
 # 
 # run "vivado -mode batch -source synth.tcl" to get a compiled vivado design
 #
-# Nexys board
-set_part xc7a100tcsg324-1
+# Genesys2 board
+set_part xc7k325tffg900-2
 
 set script_path [ file dirname [ file normalize [ info script ] ] ]
 set project_root_dir $script_path/../../.
@@ -11,7 +11,7 @@ set source_dir $project_root_dir/rtl
 set output_dir $script_path/output/.
 
 source ${script_path}/sources_vivado.tcl
-read_xdc $script_path/constr_nexys.xdc
+read_xdc $script_path/constr_genesys.xdc
 
 # Run synthesis
 synth_design -top mcu_soc_xilinx 
@@ -27,5 +27,7 @@ write_edif    -force ${output_dir}/impl_netlist.edif
 opt_design
 place_design
 route_design
+
+report_timing_summary	-file ${output_dir}/post_desing_timing_summary.rpt
 
 write_bitstream -force ${output_dir}/impl.bit -bin_file
