@@ -7,7 +7,12 @@ module mcu_soc import mcu_soc_pkg::*; #(
   input  logic rstn,
 
   output logic tx,
-  input  logic rx
+  input  logic rx,
+  output logic [3:0] ss,
+  output logic sclk,
+  input  logic miso,
+  output logic mosi,
+  output logic complete
 );
   localparam int IdLen = 4;
   localparam int AddrWidth = 32;
@@ -78,6 +83,8 @@ module mcu_soc import mcu_soc_pkg::*; #(
   obi_rsp_t             xbar_mem_obi_rsp;
   obi_req_t             xbar_uart_obi_req;
   obi_rsp_t             xbar_uart_obi_rsp;
+  obi_req_t		xbar_spi_flash_obi_req;
+  obi_rsp_t		xbar_spi_flash_obi_rsp;
 
   rvj1_top rvj1_inst (
     .clk_i              (clk),
@@ -231,7 +238,7 @@ module mcu_soc import mcu_soc_pkg::*; #(
     .mgr_port_obi_rsp_t (obi_rsp_t),
     .NumSbrPorts        (NumManagers),
     .NumMgrPorts        (NumSubordinates),
-    .NumMaxTrans        (4),
+    .NumMaxTrans        (6),
     .NumAddrRules       (NumSubordinates),
     .addr_map_rule_t    (addr_map_rule_t),
     .UseIdForRouting    (1'b0),
@@ -245,8 +252,8 @@ module mcu_soc import mcu_soc_pkg::*; #(
     .sbr_ports_req_i  ({core_instr_obi_req, core_data_obi_req}),
     .sbr_ports_rsp_o  ({core_instr_obi_rsp, core_data_obi_rsp}),
 
-    .mgr_ports_req_o  ({xbar_uart_obi_req, xbar_mem_obi_req}),
-    .mgr_ports_rsp_i  ({xbar_uart_obi_rsp, xbar_mem_obi_rsp}),
+    .mgr_ports_req_o  ({xbar_uart_obi_req, xbar_mem_obi_req, xbar_spi_flash_obi_req}),
+    .mgr_ports_rsp_i  ({xbar_uart_obi_rsp, xbar_mem_obi_rsp, xbar_spi_flash_obi_rsp}),
 
     .addr_map_i       ( Rvj1AddrMap ),
     .en_default_idx_i ('1),
@@ -301,6 +308,38 @@ module mcu_soc import mcu_soc_pkg::*; #(
     .dtr_no (),
     .out1_no(),
     .out2_no()
+  );
+
+  obi_spi #(
+    .BASE_ADDR		(32'h4000_0000),
+    .ADDR_WIDTH		(AddrWidth),
+    .DATA_WIDTH		(DataWidth),
+    .NUM_SLAVES		(4),
+    .SCLK_COUNTER_RESET_VALUE	(0),
+    .SPI_DATA_LENGTH		(8)
+  ) spi_flash (
+    .clk_i	(clk),
+    .rstn_i	(rstn),
+
+    .obi_areq_i	(xbar_spi_flash_obi_req.req),
+    .obi_agnt_o (xbar_spi_flash_obi_rsp.gnt),
+
+    .obi_aaddr_i	(xbar_spi_flash_obi_req.a.addr),
+    .obi_awdata_i	(xbar_spi_flash_obi_req.a.wdata),
+    .obi_awe_i		(xbar_spi_flash_obi_req.a.we),
+    .obi_abe_i		(xbar_spi_flash_obi_req.a.be),
+
+    .obi_rvalid_o	(xbar_spi_flash_obi_rsp.rvalid),
+    .obi_rready_i	(xbar_spi_flash_obi_req.rready),
+    .obi_rdata_o	(xbar_spi_flash_obi_rsp.r.rdata),
+    .obi_rerr_o		(xbar_spi_flash_obi_rsp.r.err),
+
+    .spi_ss_o		(ss),
+    .spi_sclk_o		(sclk),
+    .spi_mosi_o		(mosi),
+    .spi_miso_i		(miso),
+
+    .complete_o		(complete)
   );
 
 endmodule
