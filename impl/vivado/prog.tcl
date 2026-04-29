@@ -1,4 +1,4 @@
-set DEVICE xc7a100t_0
+set DEVICE xc7k325tffg900-2
 open_hw_manager
 connect_hw_server -allow_non_jtag
 open_hw_target
