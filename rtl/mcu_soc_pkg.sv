@@ -46,14 +46,16 @@ package mcu_soc_pkg;
   } addr_map_rule_t;
 
   localparam int unsigned NumManagers     = 2;
-  localparam int unsigned NumSubordinates = 2;
+  localparam int unsigned NumSubordinates = 3;
   typedef enum int {
     XbarMem  = 0,
-    XbarUart = 1
+    XbarUart = 1,
+    XbarSpiFlash = 2
   } xbar_sub_e;
 
   localparam addr_map_rule_t [NumSubordinates-1:0] Rvj1AddrMap = '{
       '{idx: XbarMem,  start_addr: 32'h8000_0000, end_addr: 32'h8000_4000},
-      '{idx: XbarUart, start_addr: 32'h6000_0000, end_addr: 32'h6000_0200}
+      '{idx: XbarUart, start_addr: 32'h6000_0000, end_addr: 32'h6000_0200},
+      '{idx: XbarSpiFlash, start_addr: 32'h4000_0000, end_addr: 32'h4000_0100}
   };
 endpackage
