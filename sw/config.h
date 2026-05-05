@@ -12,7 +12,7 @@
 // Address map
 #define BOOTROM_BASE_ADDR   0x80000000
 #define UART_BASE_ADDR      0x60000000
-#define SPI_BASE_ADDR 0x40000000
+#define SPI_BASE_ADDR 	    0x40000000
 
 // Frequencies
 #define TB_FREQUENCY        200000000

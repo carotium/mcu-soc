@@ -2,7 +2,7 @@ module mcu_soc_tb #(
   parameter string INIT_FILE="",
   parameter int    INIT_FILE_BIN=0,
   parameter int    MEM_SIZE_WORDS=4096,
-  parameter int    TIMEOUT=100000
+  parameter int    TIMEOUT=1000000
 ) ();
 
   logic clk, rstn, tx, rx, sclk, mosi, miso, complete;

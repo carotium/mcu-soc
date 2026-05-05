@@ -5,6 +5,7 @@
 // Authors:
 // - Philippe Sauter <phsauter@iis.ee.ethz.ch>
 
+#include "spi.h"
 #include "uart.h"
 #include "print.h"
 #include "config.h"
@@ -17,10 +18,13 @@ void sleep(void) {
 
 int main() {
     uart_init();
+    spi_init();
     while (1) {
-        printf("Hello World from RVJ1!\n");
-        sleep();
+        printf("RVJ1\n\r");
+	sleep();
         uart_write_flush();
+	spi_send(0xDE);
     }
+        
     return 0;
 }
