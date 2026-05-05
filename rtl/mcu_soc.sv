@@ -252,8 +252,8 @@ module mcu_soc import mcu_soc_pkg::*; #(
     .sbr_ports_req_i  ({core_instr_obi_req, core_data_obi_req}),
     .sbr_ports_rsp_o  ({core_instr_obi_rsp, core_data_obi_rsp}),
 
-    .mgr_ports_req_o  ({xbar_uart_obi_req, xbar_mem_obi_req, xbar_spi_flash_obi_req}),
-    .mgr_ports_rsp_i  ({xbar_uart_obi_rsp, xbar_mem_obi_rsp, xbar_spi_flash_obi_rsp}),
+    .mgr_ports_req_o  ({xbar_spi_flash_obi_req, xbar_uart_obi_req, xbar_mem_obi_req}),
+    .mgr_ports_rsp_i  ({xbar_spi_flash_obi_rsp, xbar_uart_obi_rsp, xbar_mem_obi_rsp}),
 
     .addr_map_i       ( Rvj1AddrMap ),
     .en_default_idx_i ('1),
