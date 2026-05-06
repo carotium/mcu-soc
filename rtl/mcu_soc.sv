@@ -1,5 +1,5 @@
 module mcu_soc import mcu_soc_pkg::*; #(
-  parameter  string INIT_FILE="",
+  parameter  INIT_FILE="",
   parameter  int    INIT_FILE_BIN=0,
   parameter  int    MEM_SIZE_WORDS=4096
   ) (
