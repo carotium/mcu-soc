@@ -6,7 +6,7 @@ module mcu_soc_tb #(
 ) ();
 
   logic clk, rstn, tx, rx;
-  always #1 clk = ~clk;
+  always #5 clk = ~clk;
 
   mcu_soc #(
     .INIT_FILE      (INIT_FILE),
