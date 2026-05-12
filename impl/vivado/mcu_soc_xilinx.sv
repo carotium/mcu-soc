@@ -19,6 +19,8 @@ module mcu_soc_xilinx import mcu_soc_pkg::*; #(
 );
 
   logic clk;
+  logic clk_20M;
+  logic rstn_o;
 
   IBUFGDS #(
     .DIFF_TERM("FALSE"),
@@ -30,13 +32,26 @@ module mcu_soc_xilinx import mcu_soc_pkg::*; #(
         .IB(diff_clk_n)
         );
 
+  (* blackbox *)
+  mcmme2_base_clkgen #(
+    //.INPUT_FREQUENCY_MHZ(200),
+    //.DIVCLK_DIVIDE(4),  // set clock to 50 MHz
+    //.CLKFBOUT_MULT(17)
+  ) clkgen_inst (
+    .sys_clk_pad_i(clk),
+    .rst_pad_i    (~rstn),
+    .async_rstn_o (),
+    .clk_o        (clk_20M),
+    .rstn_o       (rstn_o)
+  );
+
   mcu_soc #(
     .INIT_FILE     (INIT_FILE),
     .INIT_FILE_BIN (INIT_FILE_BIN),
     .MEM_SIZE_WORDS(MEM_SIZE_WORDS)
   ) mcu1 (
-    .clk  (clk),
-    .rstn (rstn),
+    .clk  (clk_20M),
+    .rstn (rstn_o),
     .tx   (tx),
     .rx   (rx),
     .ss	  (ss),

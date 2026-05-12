@@ -15,8 +15,8 @@
 #define SPI_BASE_ADDR 	    0x40000000
 
 // Frequencies
-#define TB_FREQUENCY        200000000
-#define TB_BAUDRATE         115200
+#define TB_FREQUENCY        20000000
+#define TB_BAUDRATE         9600
 
 // Peripheral configs
 // UART
@@ -25,5 +25,5 @@
 #define UART_BAUD           TB_BAUDRATE
 
 // SPI
-#define SPI_FREQ	    10000000
+#define SPI_FREQ	    1000000
 #define CLK_FREQ	    TB_FREQUENCY

@@ -21,8 +21,15 @@ int main() {
     spi_init();
     while (1) {
         printf("RVJ1\n\r");
-	sleep();
+	//sleep();
         uart_write_flush();
+	sleep();
+	//*reg8(SPI_BASE_ADDR, SPI_DIV_CLK_REG_OFFSET) = 19;
+	//*reg8(SPI_BASE_ADDR, SPI_CTRL_REG_OFFSET) = 0x0;
+	spi_select(0x1);
+	sleep();
+	spi_unselect();
+	sleep();
 	spi_send(0xDE);
     }
         

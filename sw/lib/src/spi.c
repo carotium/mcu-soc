@@ -1,7 +1,7 @@
 #include "spi.h"
 
 // SPI Divisor calculation
-#define SPI_DIVISOR(clk_freq_i, spi_freq_i) ((clk_freq_i) / (spi_freq_i) - 1)
+#define SPI_DIVISOR(clk_freq_i, spi_freq_i) ((clk_freq_i) / (spi_freq_i * 2) - 1)
 
 void spi_init() {
     // SPI Divisor calculation
