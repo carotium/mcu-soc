@@ -15,12 +15,20 @@ module mcu_soc_xilinx import mcu_soc_pkg::*; #(
   output logic sclk,
   input logic miso,
   output logic mosi,
-  output logic complete
+  output logic complete,
+
+  output logic spi_resetn,
+  output logic spi_holdn,
+  output logic spi_writeprotectn
 );
 
   logic clk;
   logic clk_20M;
   logic rstn_o;
+
+  assign spi_resetn = '1;
+  assign spi_holdn = '1;
+  assign spi_writeprotectn = '1;
 
   IBUFGDS #(
     .DIFF_TERM("FALSE"),

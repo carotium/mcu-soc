@@ -1,3 +1,5 @@
+#pragma once
+
 #include "config.h"
 #include "stdint.h"
 #include "util.h"
@@ -10,8 +12,10 @@
 
 #define SPI_START_WRITING		0x1
 #define SPI_START_READING		0x2
+#define SPI_DONE			0x20
 
 void spi_init();
 void spi_select(uint8_t slave);
 void spi_unselect();
-void spi_send(uint8_t data);
+void spi_write(uint8_t data);
+uint8_t spi_read(uint8_t bytes);

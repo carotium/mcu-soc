@@ -24,22 +24,39 @@ void spi_unselect() {
     *reg8(SPI_BASE_ADDR, SPI_SS_REG_OFFSET) = 0x0;
 }
 
-void spi_send(uint8_t data) {
+void spi_write(uint8_t data) {
     // Set data to TX data register
     *reg8(SPI_BASE_ADDR, SPI_TX_DATA_REG_OFFSET) = data;
 
     // Set slave select
-    spi_select(0x1);
+    //spi_select(0x1);
 
     // Start SPI transaction
     *reg8(SPI_BASE_ADDR, SPI_CTRL_REG_OFFSET) = SPI_START_WRITING;
 
     // Wait for SPI done transaction
-    while (*reg8(SPI_BASE_ADDR, SPI_CTRL_REG_OFFSET) != 0x20);
+    while (*reg8(SPI_BASE_ADDR, SPI_CTRL_REG_OFFSET) != SPI_DONE);
 
     // Clear slave select
-    spi_unselect();
+    //spi_unselect();
 
     // Acknowledge SPI done transaction
     *reg8(SPI_BASE_ADDR, SPI_CTRL_REG_OFFSET) = 0x0;
+}
+
+uint8_t spi_read(uint8_t bytes) {
+    uint8_t data = 0;
+    *reg8(SPI_BASE_ADDR, SPI_CTRL_REG_OFFSET) = SPI_START_READING;
+
+    // Wait for SPI transaction to complete
+    while (*reg8(SPI_BASE_ADDR, SPI_CTRL_REG_OFFSET) != SPI_DONE);
+    
+
+    // Acknowledge SPI done transaction
+    *reg8(SPI_BASE_ADDR, SPI_CTRL_REG_OFFSET) = 0x0;
+    spi_unselect();
+    
+    data = *reg8(SPI_BASE_ADDR, SPI_RX_DATA_REG_OFFSET);
+
+    return data;
 }
