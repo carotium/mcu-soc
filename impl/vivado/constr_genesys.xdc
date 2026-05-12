@@ -4,7 +4,7 @@ set_property -dict { PACKAGE_PIN AD11    IOSTANDARD LVDS } [get_ports { diff_clk
 
 create_clock -add -name sys_clk_pin -period 5.00 -waveform {0 2.5} [get_ports {diff_clk_p}];
 
-set_property -dict { PACKAGE_PIN R19   IOSTANDARD LVCMOS33 } [get_ports { rstn }]; #IO_L9P_T1_DQS_14 Sch=btnc
+set_property -dict { PACKAGE_PIN R19   IOSTANDARD LVCMOS33 } [get_ports { rstn }]; #IO_0_14 Sch=cpu_resetn
 
 set_property -dict { PACKAGE_PIN Y20    IOSTANDARD LVCMOS33 } [get_ports { rx }]; #IO_L7P_T1_AD6P_35 Sch=uart_txd_in
 set_property -dict { PACKAGE_PIN Y23    IOSTANDARD LVCMOS33 } [get_ports { tx }]; #IO_L11N_T1_SRCC_35 Sch=uart_rxd_out
