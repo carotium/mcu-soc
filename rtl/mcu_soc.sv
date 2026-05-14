@@ -1,5 +1,5 @@
 module mcu_soc import mcu_soc_pkg::*; #(
-  parameter  INIT_FILE="",
+  parameter  string INIT_FILE="",
   parameter  int    INIT_FILE_BIN=0,
   parameter  int    MEM_SIZE_WORDS=4096
   ) (
@@ -14,20 +14,6 @@ module mcu_soc import mcu_soc_pkg::*; #(
   localparam int DataWidth = 32;
   localparam int NBytes = (DataWidth / 8);
 
-  logic [IdLen-1:0]     instr_req_id;
-  logic [AddrWidth-1:0] instr_req_addr;
-  logic [DataWidth-1:0] instr_req_data;
-  logic [NBytes-1:0]    instr_req_strobe;
-  logic                 instr_req_write;
-  logic                 instr_req_valid;
-  logic                 instr_req_ready;
-
-  logic [IdLen-1:0]     instr_rsp_id;
-  logic [DataWidth-1:0] instr_rsp_data;
-  logic                 instr_rsp_error;
-  logic                 instr_rsp_valid;
-  logic                 instr_rsp_ready;
-
   logic [IdLen-1:0]     obi_instr_aid;
   logic                 obi_instr_areq;
   logic                 obi_instr_agnt;
@@ -41,20 +27,6 @@ module mcu_soc import mcu_soc_pkg::*; #(
   logic                 obi_instr_rready;
   logic [DataWidth-1:0] obi_instr_rdata;
   logic                 obi_instr_rerr;
-
-  logic [IdLen-1:0]     data_req_id;
-  logic [AddrWidth-1:0] data_req_addr;
-  logic [DataWidth-1:0] data_req_data;
-  logic [NBytes-1:0]    data_req_strobe;
-  logic                 data_req_write;
-  logic                 data_req_valid;
-  logic                 data_req_ready;
-
-  logic [IdLen-1:0]     data_rsp_id;
-  logic [DataWidth-1:0] data_rsp_data;
-  logic                 data_rsp_error;
-  logic                 data_rsp_valid;
-  logic                 data_rsp_ready;
 
   logic [IdLen-1:0]     obi_data_aid;
   logic                 obi_data_areq;
@@ -79,82 +51,46 @@ module mcu_soc import mcu_soc_pkg::*; #(
   obi_req_t             xbar_uart_obi_req;
   obi_rsp_t             xbar_uart_obi_rsp;
 
-  rvj1_top rvj1_inst (
-    .clk_i              (clk),
-    .rstn_i             (rstn),
+  rvj1_obi rvj1_inst (
+    .clk_i          (clk),
+    .rstn_i         (rstn),
 
-    .instr_req_id_o     (instr_req_id),
-    .instr_req_addr_o   (instr_req_addr),
-    .instr_req_data_o   (instr_req_data),
-    .instr_req_strobe_o (instr_req_strobe),
-    .instr_req_write_o  (instr_req_write),
-    .instr_req_valid_o  (instr_req_valid),
-    .instr_req_ready_i  (instr_req_ready),
+    .instr_aid_o    (obi_instr_aid),
+    .instr_areq_o   (obi_instr_areq),
+    .instr_agnt_i   (obi_instr_agnt),
+    .instr_aaddr_o  (obi_instr_aaddr),
+    .instr_awe_o    (obi_instr_awe),
+    .instr_abe_o    (obi_instr_abe),
+    .instr_awdata_o (obi_instr_awdata),
 
-    .instr_rsp_id_i     (instr_rsp_id),
-    .instr_rsp_data_i   (instr_rsp_data),
-    .instr_rsp_error_i  (instr_rsp_error),
-    .instr_rsp_valid_i  (instr_rsp_valid),
-    .instr_rsp_ready_o  (instr_rsp_ready),
+    .instr_rid_i    (obi_instr_rid),
+    .instr_rvalid_i (obi_instr_rvalid),
+    .instr_rready_o (obi_instr_rready),
+    .instr_rdata_i  (obi_instr_rdata),
+    .instr_rerr_i   (obi_instr_rerr),
+    
+    .data_aid_o     (obi_data_aid),
+    .data_areq_o    (obi_data_areq),
+    .data_agnt_i    (obi_data_agnt),
+    .data_aaddr_o   (obi_data_aaddr),
+    .data_awe_o     (obi_data_awe),
+    .data_abe_o     (obi_data_abe),
+    .data_awdata_o  (obi_data_awdata),
 
-    .data_req_id_o      (data_req_id),
-    .data_req_addr_o    (data_req_addr),
-    .data_req_data_o    (data_req_data),
-    .data_req_strobe_o  (data_req_strobe),
-    .data_req_write_o   (data_req_write),
-    .data_req_valid_o   (data_req_valid),
-    .data_req_ready_i   (data_req_ready),
+    .data_rid_i     (obi_data_rid),
+    .data_rvalid_i  (obi_data_rvalid),
+    .data_rready_o  (obi_data_rready),
+    .data_rdata_i   (obi_data_rdata),
+    .data_rerr_i    (obi_data_rerr),
 
-    .data_rsp_id_i      (data_rsp_id),
-    .data_rsp_data_i    (data_rsp_data),
-    .data_rsp_error_i   (data_rsp_error),
-    .data_rsp_valid_i   (data_rsp_valid),
-    .data_rsp_ready_o   (data_rsp_ready),
-
-    .irq_external_i     (1'b0),
-    .irq_timer_i        (1'b0),
-    .irq_sw_i           (1'b0),
-    .irq_lcofi_i        (1'b0),
-    .irq_platform_i     ('0),
-    .irq_nmi_i          (1'b0)
+    .irq_external_i (1'b0),
+    .irq_timer_i    (1'b0),
+    .irq_sw_i       (1'b0),
+    .irq_lcofi_i    (1'b0),
+    .irq_platform_i ('0),
+    .irq_nmi_i      (1'b0)
   );
 
-  mapped2obi #(
-    .ADDR_WIDTH(AddrWidth),
-    .DATA_WIDTH(DataWidth),
-    .IDLEN(IdLen)) m2o_instr (
-
-    .clk_i  (clk),
-    .rstn_i (rstn),
-
-    .mapped_req_id_i     (instr_req_id),
-    .mapped_req_addr_i   (instr_req_addr),
-    .mapped_req_data_i   (instr_req_data),
-    .mapped_req_strobe_i (instr_req_strobe),
-    .mapped_req_write_i  (instr_req_write),
-    .mapped_req_valid_i  (instr_req_valid),
-    .mapped_req_ready_o  (instr_req_ready),
-
-    .mapped_rsp_id_o     (instr_rsp_id),
-    .mapped_rsp_data_o   (instr_rsp_data),
-    .mapped_rsp_error_o  (instr_rsp_error),
-    .mapped_rsp_valid_o  (instr_rsp_valid),
-    .mapped_rsp_ready_i  (instr_rsp_ready),
-
-    .obi_aid_o           (obi_instr_aid),
-    .obi_areq_o          (obi_instr_areq),
-    .obi_agnt_i          (obi_instr_agnt),
-    .obi_aaddr_o         (obi_instr_aaddr),
-    .obi_awe_o           (obi_instr_awe),
-    .obi_abe_o           (obi_instr_abe),
-    .obi_awdata_o        (obi_instr_awdata),
-
-    .obi_rid_i           (obi_instr_rid),
-    .obi_rvalid_i        (obi_instr_rvalid),
-    .obi_rready_o        (obi_instr_rready),
-    .obi_rdata_i         (obi_instr_rdata),
-    .obi_rerr_i          (obi_instr_rerr)
-  );
   assign core_instr_obi_req.req     = obi_instr_areq;
   assign core_instr_obi_req.rready  = obi_instr_rready;
   assign core_instr_obi_req.a.addr  = obi_instr_aaddr;
@@ -168,43 +104,6 @@ module mcu_soc import mcu_soc_pkg::*; #(
   assign obi_instr_rid    = core_instr_obi_rsp.r.rid;
   assign obi_instr_rdata  = core_instr_obi_rsp.r.rdata;
   assign obi_instr_rerr   = core_instr_obi_rsp.r.err;
-
-  mapped2obi #(
-    .ADDR_WIDTH(AddrWidth),
-    .DATA_WIDTH(DataWidth),
-    .IDLEN(IdLen)) m2o_data (
-
-    .clk_i  (clk),
-    .rstn_i (rstn),
-
-    .mapped_req_id_i     (data_req_id),
-    .mapped_req_addr_i   (data_req_addr),
-    .mapped_req_data_i   (data_req_data),
-    .mapped_req_strobe_i (data_req_strobe),
-    .mapped_req_write_i  (data_req_write),
-    .mapped_req_valid_i  (data_req_valid),
-    .mapped_req_ready_o  (data_req_ready),
-
-    .mapped_rsp_id_o     (data_rsp_id),
-    .mapped_rsp_data_o   (data_rsp_data),
-    .mapped_rsp_error_o  (data_rsp_error),
-    .mapped_rsp_valid_o  (data_rsp_valid),
-    .mapped_rsp_ready_i  (data_rsp_ready),
-
-    .obi_aid_o           (obi_data_aid),
-    .obi_areq_o          (obi_data_areq),
-    .obi_agnt_i          (obi_data_agnt),
-    .obi_aaddr_o         (obi_data_aaddr),
-    .obi_awe_o           (obi_data_awe),
-    .obi_abe_o           (obi_data_abe),
-    .obi_awdata_o        (obi_data_awdata),
-
-    .obi_rid_i           (obi_data_rid),
-    .obi_rvalid_i        (obi_data_rvalid),
-    .obi_rready_o        (obi_data_rready),
-    .obi_rdata_i         (obi_data_rdata),
-    .obi_rerr_i          (obi_data_rerr)
-  );
 
   assign core_data_obi_req.req     = obi_data_areq;
   assign core_data_obi_req.rready  = obi_data_rready;

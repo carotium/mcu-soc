@@ -20,10 +20,16 @@ RISCV_AR      ?= $(RISCV_PREFIX)ar
 RISCV_LD      ?= $(RISCV_PREFIX)ld
 RISCV_STRIP   ?= $(RISCV_PREFIX)strip
 RISCV_BIN2HEX ?= riscv32-unknown-elf-bin2hex
+DEBUG ?= 0
 
 # Compiler and linker flags
 RISCV_FLAGS ?= -march=$(RISCV_MARCH) -mabi=$(RISCV_MABI) -mcmodel=medany \
-	-static -std=gnu99 -Os -nostdlib -fno-builtin -ffreestanding
+	-static -std=gnu99 -nostdlib -fno-builtin -ffreestanding
+ifeq ($(DEBUG),1)
+  RISCV_FLAGS += -O0 -g
+else
+  RISCV_FLAGS += -Os
+endif
 RISCV_CCFLAGS ?= $(RISCV_FLAGS) -Iinclude -I$(INCDIR) -I$(CURDIR)
 RISCV_LDFLAGS ?= -static -nostartfiles -lm -lgcc $(RISCV_FLAGS)
 
