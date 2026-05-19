@@ -2,7 +2,11 @@
 
 #include "spi.h"
 #include "config.h"
+#include "print.h"
 
 #define READ_ID 0x9E
+#define READ    0x03
 
-void flash_sendCommand(uint8_t cmd);
+void flash_init();
+void flash_read_memory(uint32_t start_addr, uint32_t num_of_data);
+void flash_send_address(uint32_t addr);

@@ -18,4 +18,4 @@ void spi_init();
 void spi_select(uint8_t slave);
 void spi_unselect();
 void spi_write(uint8_t data);
-uint8_t spi_read(uint8_t bytes);
+void spi_read(uint8_t *data, uint8_t bytes);
