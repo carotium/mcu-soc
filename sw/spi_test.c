@@ -33,14 +33,18 @@ int main() {
     printf("\r\nTyped number: %x\r\n", uart_num);
 
     while (1) {
-	    
+        printf("Start read: ");
+        uart_read();
+
         printf("\r\nReading from memory:\r\n");
 
         uint32_t start_addr = 0x0;
-        uint32_t num_of_data = 0x100;
 
-        flash_read_memory(start_addr, num_of_data);
+        uint8_t data[0xFF];
+
+        flash_read_memory(start_addr, data, sizeof(data));
 
     }
+
     return 0;
 }
