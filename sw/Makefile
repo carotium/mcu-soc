@@ -33,6 +33,7 @@ BINDIR   ?= bin
 BUILDDIR ?= build
 CRT0     ?= crt0.S
 LINK     ?= link.ld
+LINK_B   ?= link-boot.ld
 SRCDIR   ?= lib/src
 INCDIR   ?= lib/inc
 
@@ -81,9 +82,15 @@ $(BUILDDIR)/%.o: %.c
 	$(RISCV_CC) $(RISCV_CCFLAGS) -MMD -MP -c $< -o $@
 
 # Linking
-$(BINDIR)/%.elf: $(BUILDDIR)/%.o $(CRT0_OBJ) $(LIB_OBJS) $(LINK)
+$(BINDIR)/%.elf: $(BUILDDIR)/%.o $(CRT0_OBJ) $(LIB_OBJS) $(LINK) $(LINK_B)
 	mkdir -p $(dir $@)
-	$(RISCV_CC) -o $@ $(filter-out $(LINK), $^) $(RISCV_LDFLAGS) -T$(LINK)
+	@if [ "$@" = "bin/bootloader.elf" ]; then \
+		$(RISCV_CC) -o $@ $(filter-out $(LINK_B), $^) $(RISCV_LDFLAGS) -T$(LINK_B); \
+		echo "\nin if $@\n"; \
+	else \
+		$(RISCV_CC) -o $@ $(filter-out $(LINK), $^) $(RISCV_LDFLAGS) -T$(LINK); \
+		echo "\nin else $@\n"; \
+	fi
 
 # Dump ELF data and disassembly
 $(BINDIR)/%.dump: $(BINDIR)/%.elf

@@ -24,6 +24,8 @@ int main() {
 
     data_size = size;
 
+    size *= 4;
+
 	start_addr += 0x4;
 
 	uint32_t *dest_addr = (uint32_t *) 0x80001000;
@@ -33,7 +35,7 @@ int main() {
 		flash_read_memory(start_addr, (uint8_t *) src_addr, 64);
 		memcpy(dest_addr, src_addr, 64);
 		dest_addr += 16;
-		src_addr += 16;
+		//src_addr += 16;
         start_addr += 64;
 		size -= 64;
 	}
@@ -49,6 +51,9 @@ int main() {
     for(int i = 0; i < data_size; i++) {
         printf("%x: %x\r\n", (data_in_ram + i) , *(data_in_ram + i));
     }
+
+    void *flash_program = (void *)0x80001000;
+    goto *flash_program;
 
 	return 0;
 }
