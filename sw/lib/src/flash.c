@@ -1,6 +1,6 @@
 #include "flash.h"
 
-void flash_init() {
+uint8_t flash_init() {
     spi_select(SLAVE);
 
     spi_write(READ_ID);
@@ -16,6 +16,11 @@ void flash_init() {
         printf("%x ", flash_id[i]);
         if(i == 7) printf("\r\n");
     }
+
+    if(flash_id[0] == 0x20 && flash_id[1] == 0xBA && flash_id[2] == 0x19)
+	    return 0;
+    else
+	    return 1;
 }
 
 void flash_send_address(uint32_t addr) {
