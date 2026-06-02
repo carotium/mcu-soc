@@ -25,13 +25,13 @@ uint8_t flash_init() {
 
 void flash_send_address(uint32_t addr) {
 
-    uint8_t addr_byte_0 = (uint8_t) addr;
-    uint8_t addr_byte_1 = (uint8_t) addr >> 8;
-    uint8_t addr_byte_2 = (uint8_t) addr >> 16;
+    uint8_t addr_byte_0 = (uint8_t) (addr);
+    uint8_t addr_byte_1 = (uint8_t) (addr >> 8);
+    uint8_t addr_byte_2 = (uint8_t) (addr >> 16);
 
-    spi_write(addr_byte_0);
-    spi_write(addr_byte_1);
     spi_write(addr_byte_2);
+    spi_write(addr_byte_1);
+    spi_write(addr_byte_0);
 }
 
 void flash_read_memory(uint32_t start_addr, uint8_t *data, uint32_t num_of_data) {
