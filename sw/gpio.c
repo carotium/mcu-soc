@@ -5,7 +5,36 @@
 
 #define GPIO  0x40000000
 #define TIMER 0x30000000
+#define UART  0x60000000
 
+
+volatile uint32_t * uart_config = (uint32_t *) (UART+0);
+volatile uint32_t * uart_speed = (uint32_t *) (UART+4);
+volatile uint32_t * uart_tx = (uint32_t *) (UART+8);
+volatile uint32_t * uart_status = (uint32_t *) (UART+12);
+
+void uart_init() {
+    // configure UART: enable, no parity, 1 stop bit, 8 data bits
+    *uart_config = 0x00000001;
+    // set speed
+    int limit; 
+    limit = 5208; // 50Mhz / 9600;
+    *uart_speed = limit;
+}
+
+void uart_print_char(char c) {
+	// wait until UART is ready to transmit
+	while ((*uart_status & 0x00000001) == 0) {
+		// UART is not ready, keep waiting
+	}
+	*uart_tx = (uint32_t) c;
+}
+
+void uart_print_string(const char * str) {
+    while (*str) {
+        uart_print_char(*str++);
+    }
+}
 int main()
 {
     volatile uint32_t * led_device = (uint32_t *) (GPIO+0);
@@ -26,8 +55,8 @@ int main()
 	//start counter
 	*timer_config = 0x00000001;
 	// read counter
-	limit = 50000000;
-
+	limit = 100000000;
+    uart_init();
     
 	while(1){
 		led_value =  ~led_value;
@@ -37,11 +66,12 @@ int main()
     	counter_new = *timer_count_low + (counter_new << 32);
     	counter_old = counter_new;
 
-
+        uart_print_string("LEDs toggled\r\n");
     	while((counter_old + limit) > counter_new) {
     		counter_new = *timer_count_high;
     	    counter_new = *timer_count_low + (counter_new << 32);
     	}
+        
     }
 
     return 0;

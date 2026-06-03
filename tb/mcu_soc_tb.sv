@@ -7,7 +7,7 @@ module mcu_soc_tb #(
   parameter int    GPIO_NUM_OUT=4
 ) ();
 
-  logic clk, rstn, tx, rx;
+  logic clk, rstn, tx;
   logic [GPIO_NUM_OUT-1:0] gpio_out;
   always #5 clk = ~clk;
 
@@ -18,15 +18,17 @@ module mcu_soc_tb #(
     .GPIO_NUM_IN    (GPIO_NUM_IN),
     .GPIO_NUM_OUT   (GPIO_NUM_OUT)
   ) mcux (
-    .clk (clk),
-    .rstn(rstn),
-    .tx  (tx),
-    .rx  (rx),
-    .gpio_in_i (4'b0000),
-    .gpio_out_o(gpio_out)
+    .clk          (clk),
+    .rstn         (rstn),
+    .jtag_tck_i   (1'b0),
+    .jtag_tdi_i   (1'b0),
+    .jtag_tdo_o   (),
+    .jtag_tms_i   (1'b0),
+    .jtag_trstn_i (1'b1),
+    .tx           (tx),
+    .gpio_in_i    (4'b0000),
+    .gpio_out_o   (gpio_out)
   );
-
-  assign rx = 1'b0;
 
   initial begin
   $display("Starting simulation of MCU.");

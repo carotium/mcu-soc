@@ -15,7 +15,6 @@ module mcu_soc import mcu_soc_pkg::*; #(
   input  logic                    jtag_trstn_i,
 
   output logic                    tx,
-  input  logic                    rx,
 
   input  logic [GPIO_NUM_IN-1:0]  gpio_in_i,
   output logic [GPIO_NUM_OUT-1:0] gpio_out_o
@@ -284,31 +283,23 @@ module mcu_soc import mcu_soc_pkg::*; #(
     .dmi_resp_o        (dmi_resp)
   );
 
-  obi_uart #(
-    .ObiCfg   (SbrObiCfg),
-    .obi_req_t(sbr_obi_req_t),
-    .obi_rsp_t(sbr_obi_rsp_t)
-  ) uart (
+  obi_uart uart_inst (
     .clk_i  (clk),
-    .rst_ni (rstn),
+    .rstn_i (rstn),
 
-    .obi_req_i (xbar_uart_obi_req),
-    .obi_rsp_o (xbar_uart_obi_rsp),
+    .obi_areq_i  (xbar_uart_obi_req.req),
+    .obi_agnt_o  (xbar_uart_obi_rsp.gnt),
+    .obi_aaddr_i (xbar_uart_obi_req.a.addr),
+    .obi_awdata_i(xbar_uart_obi_req.a.wdata),
+    .obi_awe_i   (xbar_uart_obi_req.a.we) ,
+    .obi_abe_i   (xbar_uart_obi_req.a.be),
 
-    .rxd_i  (rx),
-    .txd_o  (tx),
+    .obi_rvalid_o(xbar_uart_obi_rsp.rvalid),
+    .obi_rready_i(xbar_uart_obi_req.rready),
+    .obi_rdata_o (xbar_uart_obi_rsp.r.rdata),
+    .obi_rerr_o  (xbar_uart_obi_rsp.r.err),
 
-    .irq_o  (),
-    .irq_no (),
-
-    .cts_ni ('1),
-    .dsr_ni ('1),
-    .ri_ni  ('1),
-    .cd_ni  ('1),
-    .rts_no (),
-    .dtr_no (),
-    .out1_no(),
-    .out2_no()
+    .tx_o        (tx)
   );
 
    obi_gpio #(

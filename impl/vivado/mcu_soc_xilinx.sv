@@ -9,7 +9,6 @@ module mcu_soc_xilinx import mcu_soc_pkg::*; #(
   input  logic rst,
 
   output logic tx,
-  input  logic rx,
 
   input  logic [GPIO_NUM_IN-1:0]  gpio_in_i,
   output logic [GPIO_NUM_OUT-1:0] gpio_out_o
@@ -29,7 +28,6 @@ module mcu_soc_xilinx import mcu_soc_pkg::*; #(
     .jtag_tms_i  (1'b0),
     .jtag_trstn_i(1'b1),
     .tx          (tx),
-    .rx          (rx),
     .gpio_in_i   (gpio_in_i),
     .gpio_out_o  (gpio_out_o)
   );
