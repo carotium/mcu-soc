@@ -75,6 +75,8 @@ module mcu_soc import mcu_soc_pkg::*; #(
   sbr_obi_rsp_t         xbar_mem_obi_rsp;
   sbr_obi_req_t         xbar_gpio_obi_req;
   sbr_obi_rsp_t         xbar_gpio_obi_rsp;
+  sbr_obi_req_t         xbar_timer_obi_req;
+  sbr_obi_rsp_t         xbar_timer_obi_rsp;
   sbr_obi_req_t         xbar_uart_obi_req;
   sbr_obi_rsp_t         xbar_uart_obi_rsp;
 
@@ -180,8 +182,8 @@ module mcu_soc import mcu_soc_pkg::*; #(
     .sbr_ports_req_i  ({dbg_obi_man_req, core_instr_obi_req, core_data_obi_req}),
     .sbr_ports_rsp_o  ({dbg_obi_man_rsp, core_instr_obi_rsp, core_data_obi_rsp}),
 
-    .mgr_ports_req_o  ({xbar_obi_sub_req, xbar_gpio_obi_req, xbar_uart_obi_req, xbar_mem_obi_req}),
-    .mgr_ports_rsp_i  ({xbar_obi_sub_rsp, xbar_gpio_obi_rsp, xbar_uart_obi_rsp, xbar_mem_obi_rsp}),
+    .mgr_ports_req_o  ({xbar_obi_sub_req, xbar_timer_obi_req, xbar_gpio_obi_req, xbar_uart_obi_req, xbar_mem_obi_req}),
+    .mgr_ports_rsp_i  ({xbar_obi_sub_rsp, xbar_timer_obi_rsp, xbar_gpio_obi_rsp, xbar_uart_obi_rsp, xbar_mem_obi_rsp}),
 
     .addr_map_i       ( Rvj1AddrMap ),
     .en_default_idx_i ('1),
@@ -309,7 +311,6 @@ module mcu_soc import mcu_soc_pkg::*; #(
     .out2_no()
   );
 
-
    obi_gpio #(
        .ADDR_WIDTH(32),
        .DATA_WIDTH(32),
@@ -331,5 +332,24 @@ module mcu_soc import mcu_soc_pkg::*; #(
        .gpio_in_i   (gpio_in_i),
        .gpio_out_o  (gpio_out_o)
    );
+
+   obi_timer #(
+    .ADDR_WIDTH(32),
+    .DATA_WIDTH(32)
+) i_obi_timer (
+    .clk_i       (clk),
+    .rstn_i      (rstn),
+    .obi_areq_i  (xbar_timer_obi_req.req),
+    .obi_agnt_o  (xbar_timer_obi_rsp.gnt),
+    .obi_aaddr_i (xbar_timer_obi_req.a.addr),
+    .obi_awdata_i(xbar_timer_obi_req.a.wdata),
+    .obi_awe_i   (xbar_timer_obi_req.a.we),
+    .obi_abe_i   (xbar_timer_obi_req.a.be),
+    .obi_rvalid_o(xbar_timer_obi_rsp.rvalid),
+    .obi_rready_i(xbar_timer_obi_req.rready),
+    .obi_rdata_o (xbar_timer_obi_rsp.r.rdata),
+    .obi_rerr_o  (xbar_timer_obi_rsp.r.err ),
+    .overflow_o  ()
+);
 
 endmodule

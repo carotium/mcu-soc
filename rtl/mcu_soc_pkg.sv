@@ -93,19 +93,21 @@ package mcu_soc_pkg;
   } addr_map_rule_t;
 
   localparam int unsigned NumManagers     = 3;
-  localparam int unsigned NumSubordinates = 4;
+  localparam int unsigned NumSubordinates = 5;
   typedef enum int {
     XbarMem  = 0,
     XbarUart = 1,
     XbarGpio = 2,
-    XbarDbg  = 3
+    XbarTimer = 3,
+    XbarDbg  = 4
   } xbar_sub_e;
 
   localparam addr_map_rule_t [NumSubordinates-1:0] Rvj1AddrMap = '{
-      '{idx: XbarMem,  start_addr: 32'h8000_0000, end_addr: 32'h8000_4000},
-      '{idx: XbarUart, start_addr: 32'h6000_0000, end_addr: 32'h6000_0200},
-      '{idx: XbarGpio, start_addr: 32'h4000_0000, end_addr: 32'h4000_0200},
-      '{idx: XbarDbg,  start_addr: 32'h0000_0000, end_addr: 32'h0004_0000}
+      '{idx: XbarMem,   start_addr: 32'h8000_0000, end_addr: 32'h8000_4000},
+      '{idx: XbarUart,  start_addr: 32'h6000_0000, end_addr: 32'h6000_0200},
+      '{idx: XbarGpio,  start_addr: 32'h4000_0000, end_addr: 32'h4000_0200},
+      '{idx: XbarTimer, start_addr: 32'h3000_0000, end_addr: 32'h3000_0200},
+      '{idx: XbarDbg,   start_addr: 32'h0000_0000, end_addr: 32'h0004_0000}
   };
 
   typedef struct packed {
