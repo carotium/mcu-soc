@@ -1,4 +1,7 @@
+
 package mcu_soc_pkg;
+  `include "obi_typedef.svh"
+
   localparam logic [31:0] McuBootAddr     = 32'h8000_0000;
   localparam logic [31:0] McuDmRomAddr    = 32'h0000_0800;
   localparam logic [6:0]  MVendorIdOffset = 7'h2;
@@ -7,108 +10,84 @@ package mcu_soc_pkg;
   localparam logic [31:0] McuMArchId      = 32'hd22;
   localparam logic [31:0] McuMImpId       = '0;
   localparam int unsigned McuMHartId      = 0;
-
-  localparam obi_pkg::obi_cfg_t MgrObiCfg = '{
-    UseRReady:   1'b1,
-    CombGnt:     1'b0,
-    AddrWidth:   32,
-    DataWidth:   32,
-    IdWidth:     4,
-    Integrity:   1'b0,
-    BeFull:      1'b1,
-    OptionalCfg: '0
-  };
-
-  localparam obi_pkg::obi_cfg_t SbrObiCfg = '{
-    UseRReady:   1'b1,
-    CombGnt:     1'b0,
-    AddrWidth:   32,
-    DataWidth:   32,
-    IdWidth:     6,
-    Integrity:   1'b0,
-    BeFull:      1'b1,
-    OptionalCfg: '0
-  };
-
-  typedef struct packed {
-    logic [MgrObiCfg.AddrWidth-1:0]   addr;
-    logic                             we;
-    logic [MgrObiCfg.DataWidth/8-1:0] be;
-    logic [MgrObiCfg.DataWidth-1:0]   wdata;
-    logic [MgrObiCfg.IdWidth-1:0]     aid;
-    logic                             a_optional;
-  } mgr_obi_a_chan_t;
-
-  typedef struct packed {
-    mgr_obi_a_chan_t a;
-    logic            req;
-    logic            rready;
-  } mgr_obi_req_t;
-
-  typedef struct packed {
-    logic [MgrObiCfg.DataWidth-1:0] rdata;
-    logic [MgrObiCfg.IdWidth-1:0]   rid;
-    logic                           err;
-    logic                           r_optional;
-  } mgr_obi_r_chan_t;
-
-  typedef struct packed {
-    mgr_obi_r_chan_t r;
-    logic            gnt;
-    logic            rvalid;
-  } mgr_obi_rsp_t;
-
-  typedef struct packed {
-    logic [SbrObiCfg.AddrWidth-1:0]   addr;
-    logic                             we;
-    logic [SbrObiCfg.DataWidth/8-1:0] be;
-    logic [SbrObiCfg.DataWidth-1:0]   wdata;
-    logic [SbrObiCfg.IdWidth-1:0]     aid;
-    logic                             a_optional;
-  } sbr_obi_a_chan_t;
-
-  typedef struct packed {
-    sbr_obi_a_chan_t a;
-    logic            req;
-    logic            rready;
-  } sbr_obi_req_t;
-
-  typedef struct packed {
-    logic [SbrObiCfg.DataWidth-1:0] rdata;
-    logic [SbrObiCfg.IdWidth-1:0]   rid;
-    logic                           err;
-    logic                           r_optional;
-  } sbr_obi_r_chan_t;
-
-  typedef struct packed {
-    sbr_obi_r_chan_t r;
-    logic            gnt;
-    logic            rvalid;
-  } sbr_obi_rsp_t;
-
-  typedef struct packed {
-    logic [31:0] idx;
-    logic [31:0] start_addr;
-    logic [31:0] end_addr;
-  } addr_map_rule_t;
+  localparam int unsigned AddrWidth       = 32;
+  localparam int unsigned DataWidth       = 32;
+  localparam int unsigned IdWidth         = 4;
 
   localparam int unsigned NumManagers     = 3;
   localparam int unsigned NumSubordinates = 5;
+
   typedef enum int {
-    XbarMem  = 0,
-    XbarUart = 1,
-    XbarGpio = 2,
-    XbarTimer = 3,
-    XbarDbg  = 4
+    XbarSbrMem   = 0,
+    XbarSbrUart  = 1,
+    XbarSbrGpio  = 2,
+    XbarSbrTimer = 3,
+    XbarSbrDbg   = 4
   } xbar_sub_e;
 
-  localparam addr_map_rule_t [NumSubordinates-1:0] Rvj1AddrMap = '{
-      '{idx: XbarMem,   start_addr: 32'h8000_0000, end_addr: 32'h8000_4000},
-      '{idx: XbarUart,  start_addr: 32'h6000_0000, end_addr: 32'h6000_0200},
-      '{idx: XbarGpio,  start_addr: 32'h4000_0000, end_addr: 32'h4000_0200},
-      '{idx: XbarTimer, start_addr: 32'h3000_0000, end_addr: 32'h3000_0200},
-      '{idx: XbarDbg,   start_addr: 32'h0000_0000, end_addr: 32'h0004_0000}
-  };
+  typedef enum int {
+    XbarMgrLsu   = 0,
+    XbarMgrIfu   = 1,
+    XbarMgrDbg   = 2
+  } xbar_mgr_e;
+
+
+  // Xbar & Obi config
+  localparam obi_pkg::xbar_cfg_t xbar_cfg = obi_pkg::xbar_default_cfg(NumManagers, NumSubordinates, AddrWidth, DataWidth, IdWidth);
+
+  localparam bit unsigned [xbar_cfg.Subordinates-1:0] UseSrFifoMask = 5'b01110;
+  localparam int unsigned SrFifoDepth [xbar_cfg.Subordinates] = '{0, 4, 4, 4, 0};
+
+  typedef struct packed {
+        logic [xbar_cfg.IdWidth-1:0]          obi_aid;
+        logic [$clog2(xbar_cfg.Managers)-1:0] obi_mid;
+  } obi_sub_id_t;
+
+  typedef struct packed {
+        logic                               obi_areq;
+        logic [xbar_cfg.AddrWidth-1:0]      obi_aadr;
+        logic                               obi_awe; 
+        logic [xbar_cfg.DataWidth/8-1:0]    obi_abe;
+        logic [xbar_cfg.DataWidth-1:0]      obi_awdata;
+        logic [xbar_cfg.IdWidth-1:0]        obi_aid;
+    } mgr_obi_a_t;
+
+  typedef struct packed {
+        logic                               obi_rvalid;
+        logic                               obi_rerr;
+        logic [xbar_cfg.DataWidth-1:0]      obi_rdata;
+        logic [xbar_cfg.IdWidth-1:0]        obi_rid;
+    } mgr_obi_r_t;
+
+  typedef struct packed {
+        logic                               obi_areq;
+        logic [xbar_cfg.AddrWidth-1:0]      obi_aadr;
+        logic                               obi_awe; 
+        logic [xbar_cfg.DataWidth/8-1:0]    obi_abe;
+        logic [xbar_cfg.DataWidth-1:0]      obi_awdata;
+        logic [(xbar_cfg.IdWidth+2)-1:0]        obi_aid;
+    } sub_obi_a_t;
+
+  typedef struct packed {
+        logic                               obi_rvalid;
+        logic                               obi_rerr;
+        logic [xbar_cfg.DataWidth-1:0]      obi_rdata;
+        logic [(xbar_cfg.IdWidth+2)-1:0]        obi_rid;
+    } sub_obi_r_t;
+  //`TYPEDEF_OBI_CHANS(mgr_obi_a_t, mgr_obi_r_t, obi_pkg::MANAGER, xbar_cfg);
+  //`TYPEDEF_OBI_CHANS(sub_obi_a_t, sub_obi_r_t, obi_pkg::SUBORDINATE, xbar_cfg);
+
+  `TYPEDEF_XBAR_ADDR_MAP(addr_map_t, AddrWidth, NumSubordinates);
+
+  /*localparam addr_map_t Rvj1AddrMap [xbar_cfg.NoMaps] = '{
+      '{idx: XbarSbrMem,   base: 32'h8000_0000, mask: 32'hffff_4000}, 
+      '{idx: XbarSbrUart,  base: 32'h6000_0000, mask: 32'hffff_f200},
+      '{idx: XbarSbrGpio,  base: 32'h4000_0000, mask: 32'hffff_f200},
+      '{idx: XbarSbrTimer, base: 32'h3000_0000, mask: 32'hffff_f200},
+      '{idx: XbarSbrDbg,   base: 32'h0000_0000, mask: 32'hfff4_0000}
+  };*/
+
+  `TYPEDEF_XBAR_CONNECTIVITY(Connectivity, NumSubordinates, NumManagers, {{5'b11111}, {5'b11111}, {5'b11111}});
 
   typedef struct packed {
     bit [ 3:0] version;

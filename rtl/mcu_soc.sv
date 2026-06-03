@@ -19,12 +19,12 @@ module mcu_soc import mcu_soc_pkg::*; #(
   input  logic [GPIO_NUM_IN-1:0]  gpio_in_i,
   output logic [GPIO_NUM_OUT-1:0] gpio_out_o
 );
-  localparam int IdLen = 4;
+  localparam int IdWidth = 4;
   localparam int AddrWidth = 32;
   localparam int DataWidth = 32;
   localparam int NBytes = (DataWidth / 8);
 
-  logic [IdLen-1:0]     obi_instr_aid;
+  logic [IdWidth-1:0]   obi_instr_aid;
   logic                 obi_instr_areq;
   logic                 obi_instr_agnt;
   logic [AddrWidth-1:0] obi_instr_aaddr;
@@ -32,13 +32,13 @@ module mcu_soc import mcu_soc_pkg::*; #(
   logic [NBytes-1:0]    obi_instr_abe;
   logic [DataWidth-1:0] obi_instr_awdata;
 
-  logic [IdLen-1:0]     obi_instr_rid;
+  logic [IdWidth-1:0]   obi_instr_rid;
   logic                 obi_instr_rvalid;
   logic                 obi_instr_rready;
   logic [DataWidth-1:0] obi_instr_rdata;
   logic                 obi_instr_rerr;
 
-  logic [IdLen-1:0]     obi_data_aid;
+  logic [IdWidth-1:0]   obi_data_aid;
   logic                 obi_data_areq;
   logic                 obi_data_agnt;
   logic [AddrWidth-1:0] obi_data_aaddr;
@@ -46,7 +46,7 @@ module mcu_soc import mcu_soc_pkg::*; #(
   logic [NBytes-1:0]    obi_data_abe;
   logic [DataWidth-1:0] obi_data_awdata;
 
-  logic [IdLen-1:0]     obi_data_rid;
+  logic [IdWidth-1:0]   obi_data_rid;
   logic                 obi_data_rvalid;
   logic                 obi_data_rready;
   logic [DataWidth-1:0] obi_data_rdata;
@@ -61,23 +61,23 @@ module mcu_soc import mcu_soc_pkg::*; #(
   logic                 dmi_resp_ready;
   dm::dmi_resp_t        dmi_resp;
 
-  mgr_obi_req_t         core_instr_obi_req;
-  mgr_obi_rsp_t         core_instr_obi_rsp;
-  mgr_obi_req_t         core_data_obi_req;
-  mgr_obi_rsp_t         core_data_obi_rsp;
-  mgr_obi_req_t         dbg_obi_man_req;
-  mgr_obi_rsp_t         dbg_obi_man_rsp;
-  
-  sbr_obi_req_t         xbar_obi_sub_req;
-  sbr_obi_rsp_t         xbar_obi_sub_rsp;
-  sbr_obi_req_t         xbar_mem_obi_req;
-  sbr_obi_rsp_t         xbar_mem_obi_rsp;
-  sbr_obi_req_t         xbar_gpio_obi_req;
-  sbr_obi_rsp_t         xbar_gpio_obi_rsp;
-  sbr_obi_req_t         xbar_timer_obi_req;
-  sbr_obi_rsp_t         xbar_timer_obi_rsp;
-  sbr_obi_req_t         xbar_uart_obi_req;
-  sbr_obi_rsp_t         xbar_uart_obi_rsp;
+
+  mgr_obi_a_t obi_a_chans_mgr        [NumManagers];
+  logic       obi_agnt_signals_mgr   [NumManagers];
+  mgr_obi_r_t obi_r_chans_mgr        [NumManagers];
+  logic       obi_rready_signals_mgr [NumManagers];
+
+  sub_obi_a_t obi_a_chans_sub        [NumSubordinates];
+  logic       obi_agnt_signals_sub   [NumSubordinates];
+  sub_obi_r_t obi_r_chans_sub        [NumSubordinates];
+  logic       obi_rready_signals_sub [NumSubordinates];
+
+  addr_map_t address_map [xbar_cfg.NoMaps];
+  assign address_map[0] = '{idx: 0,   base: 32'h8000_0000, mask: 32'hffff_4000}; 
+  assign address_map[1] = '{idx: 1,   base: 32'h6000_0000, mask: 32'hffff_f200};
+  assign address_map[2] = '{idx: 2,   base: 32'h4000_0000, mask: 32'hffff_f200};
+  assign address_map[3] = '{idx: 3,   base: 32'h3000_0000, mask: 32'hffff_f200};
+  assign address_map[4] = '{idx: 4,   base: 32'h0000_0000, mask: 32'hfff4_0000};
 
   rvj1_obi #(
     .BootAddr (McuBootAddr),
@@ -127,89 +127,84 @@ module mcu_soc import mcu_soc_pkg::*; #(
 
     .debug_req_i    (debug_req)
   );
+  assign obi_instr_agnt                          = obi_agnt_signals_mgr[XbarMgrIfu];
+  assign obi_a_chans_mgr[XbarMgrIfu].obi_areq    = obi_instr_areq;
+  assign obi_a_chans_mgr[XbarMgrIfu].obi_aadr    = obi_instr_aaddr;
+  assign obi_a_chans_mgr[XbarMgrIfu].obi_awe     = obi_instr_awe;
+  assign obi_a_chans_mgr[XbarMgrIfu].obi_abe     = obi_instr_abe;
+  assign obi_a_chans_mgr[XbarMgrIfu].obi_awdata  = obi_instr_awdata;
+  assign obi_a_chans_mgr[XbarMgrIfu].obi_aid     = obi_instr_aid;
 
-  assign core_instr_obi_req.req     = obi_instr_areq;
-  assign core_instr_obi_req.rready  = obi_instr_rready;
-  assign core_instr_obi_req.a.addr  = obi_instr_aaddr;
-  assign core_instr_obi_req.a.we    = obi_instr_awe;
-  assign core_instr_obi_req.a.be    = obi_instr_abe;
-  assign core_instr_obi_req.a.wdata = obi_instr_awdata;
-  assign core_instr_obi_req.a.aid   = obi_instr_aid;
+  assign obi_rready_signals_mgr[XbarMgrIfu]  = obi_instr_rready;
+  assign obi_instr_rvalid                    = obi_r_chans_mgr[XbarMgrIfu].obi_rvalid;
+  assign obi_instr_rdata                     = obi_r_chans_mgr[XbarMgrIfu].obi_rdata;
+  assign obi_instr_rerr                      = obi_r_chans_mgr[XbarMgrIfu].obi_rerr;
+  assign obi_instr_rid                       = obi_r_chans_mgr[XbarMgrIfu].obi_rid;
 
-  assign obi_instr_agnt   = core_instr_obi_rsp.gnt;
-  assign obi_instr_rvalid = core_instr_obi_rsp.rvalid;
-  assign obi_instr_rid    = core_instr_obi_rsp.r.rid;
-  assign obi_instr_rdata  = core_instr_obi_rsp.r.rdata;
-  assign obi_instr_rerr   = core_instr_obi_rsp.r.err;
+  assign obi_data_agnt                          = obi_agnt_signals_mgr[XbarMgrLsu];
+  assign obi_a_chans_mgr[XbarMgrLsu].obi_areq   = obi_data_areq;
+  assign obi_a_chans_mgr[XbarMgrLsu].obi_aadr   = obi_data_aaddr;
+  assign obi_a_chans_mgr[XbarMgrLsu].obi_awe    = obi_data_awe;
+  assign obi_a_chans_mgr[XbarMgrLsu].obi_abe    = obi_data_abe;
+  assign obi_a_chans_mgr[XbarMgrLsu].obi_awdata = obi_data_awdata;
+  assign obi_a_chans_mgr[XbarMgrLsu].obi_aid    = obi_data_aid;
 
-  assign core_data_obi_req.req     = obi_data_areq;
-  assign core_data_obi_req.rready  = obi_data_rready;
-  assign core_data_obi_req.a.addr  = obi_data_aaddr;
-  assign core_data_obi_req.a.we    = obi_data_awe;
-  assign core_data_obi_req.a.be    = obi_data_abe;
-  assign core_data_obi_req.a.wdata = obi_data_awdata;
-  assign core_data_obi_req.a.aid   = obi_data_aid;
-
-  assign obi_data_agnt   = core_data_obi_rsp.gnt;
-  assign obi_data_rvalid = core_data_obi_rsp.rvalid;
-  assign obi_data_rid    = core_data_obi_rsp.r.rid;
-  assign obi_data_rdata  = core_data_obi_rsp.r.rdata;
-  assign obi_data_rerr   = core_data_obi_rsp.r.err;
+  assign obi_rready_signals_mgr[XbarMgrLsu]  = obi_data_rready;
+  assign obi_data_rvalid                     = obi_r_chans_mgr[XbarMgrLsu].obi_rvalid;
+  assign obi_data_rdata                      = obi_r_chans_mgr[XbarMgrLsu].obi_rdata;
+  assign obi_data_rerr                       = obi_r_chans_mgr[XbarMgrLsu].obi_rerr;
+  assign obi_data_rid                        = obi_r_chans_mgr[XbarMgrLsu].obi_rid;
 
   obi_xbar #(
-    .SbrPortObiCfg      (MgrObiCfg),
-    .MgrPortObiCfg      (SbrObiCfg),
-    .sbr_port_obi_req_t (mgr_obi_req_t),
-    .sbr_port_a_chan_t  (mgr_obi_a_chan_t),
-    .sbr_port_obi_rsp_t (mgr_obi_rsp_t),
-    .sbr_port_r_chan_t  (mgr_obi_r_chan_t),
-    .mgr_port_obi_req_t (sbr_obi_req_t),
-    .mgr_port_obi_rsp_t (sbr_obi_rsp_t),
-    .NumSbrPorts        (NumManagers),
-    .NumMgrPorts        (NumSubordinates),
-    .NumMaxTrans        (4),
-    .NumAddrRules       (NumSubordinates),
-    .addr_map_rule_t    (addr_map_rule_t),
-    .UseIdForRouting    (1'b1),
-    .Connectivity       ('1)
+    .XbarCfg(xbar_cfg),
+    .mgr_obi_a_t(mgr_obi_a_t),
+    .mgr_obi_r_t(mgr_obi_r_t),
+    .sub_obi_a_t(sub_obi_a_t),
+    .sub_obi_r_t(sub_obi_r_t),
+    .addr_map_t(addr_map_t),
+
+    .USE_SR_FIFO_MASK(UseSrFifoMask),
+    .SR_FIFO_DEPTHS(SrFifoDepth),
+
+    .CONNECTIVITY(Connectivity)
   ) xbar (
     .clk_i            (clk),
-    .rst_ni           (rstn),
+    .rstn_i           (rstn),
 
-    .testmode_i       (1'b0),
+    .mgr_obi_a_chans       (obi_a_chans_mgr),
+    .mgr_obi_agnt_signals  (obi_agnt_signals_mgr),
+    .mgr_obi_r_chans       (obi_r_chans_mgr),
+    .mgr_obi_rready_signals(obi_rready_signals_mgr),
 
-    .sbr_ports_req_i  ({dbg_obi_man_req, core_instr_obi_req, core_data_obi_req}),
-    .sbr_ports_rsp_o  ({dbg_obi_man_rsp, core_instr_obi_rsp, core_data_obi_rsp}),
+    .sub_obi_a_chans       (obi_a_chans_sub),
+    .sub_obi_agnt_signals  (obi_agnt_signals_sub),
+    .sub_obi_r_chans       (obi_r_chans_sub),
+    .sub_obi_rready_signals(obi_rready_signals_sub),
 
-    .mgr_ports_req_o  ({xbar_obi_sub_req, xbar_timer_obi_req, xbar_gpio_obi_req, xbar_uart_obi_req, xbar_mem_obi_req}),
-    .mgr_ports_rsp_i  ({xbar_obi_sub_rsp, xbar_timer_obi_rsp, xbar_gpio_obi_rsp, xbar_uart_obi_rsp, xbar_mem_obi_rsp}),
-
-    .addr_map_i       ( Rvj1AddrMap ),
-    .en_default_idx_i ('1),
-    .default_idx_i    ('0)
+    .addr_map_i            ( address_map )
   );
 
   obi_ram #(
     .INIT_FILE     (INIT_FILE),
     .INIT_FILE_BIN (INIT_FILE_BIN),
     .MEM_SIZE_WORDS(MEM_SIZE_WORDS),
-    .IDLEN         (SbrObiCfg.IdWidth)
+    .IDLEN         (xbar_cfg.IdWidth + 2)
   ) mem (
     .clk_i  (clk),
     .rstn_i (rstn),
 
-    .obi_aid_i    (xbar_mem_obi_req.a.aid),
-    .obi_areq_i   (xbar_mem_obi_req.req),
-    .obi_agnt_o   (xbar_mem_obi_rsp.gnt),
-    .obi_aaddr_i  (xbar_mem_obi_req.a.addr),
-    .obi_awe_i    (xbar_mem_obi_req.a.we),
-    .obi_awdata_i (xbar_mem_obi_req.a.wdata),
-    .obi_abe_i    (xbar_mem_obi_req.a.be),
+    .obi_aid_i    (obi_a_chans_sub[XbarSbrMem].obi_aid),
+    .obi_areq_i   (obi_a_chans_sub[XbarSbrMem].obi_areq),
+    .obi_agnt_o   (obi_agnt_signals_sub[XbarSbrMem]),
+    .obi_aaddr_i  (obi_a_chans_sub[XbarSbrMem].obi_aadr),
+    .obi_awe_i    (obi_a_chans_sub[XbarSbrMem].obi_awe),
+    .obi_awdata_i (obi_a_chans_sub[XbarSbrMem].obi_awdata),
+    .obi_abe_i    (obi_a_chans_sub[XbarSbrMem].obi_abe),
 
-    .obi_rid_o    (xbar_mem_obi_rsp.r.rid),
-    .obi_rvalid_o (xbar_mem_obi_rsp.rvalid),
-    .obi_rready_i (xbar_mem_obi_req.rready),
-    .obi_rdata_o  (xbar_mem_obi_rsp.r.rdata)
+    .obi_rid_o    (obi_r_chans_sub[XbarSbrMem].obi_rid),
+    .obi_rvalid_o (obi_r_chans_sub[XbarSbrMem].obi_rvalid),
+    .obi_rready_i (obi_rready_signals_sub[XbarSbrMem]),
+    .obi_rdata_o  (obi_r_chans_sub[XbarSbrMem].obi_rdata)
   );
 
   dmi_jtag #(
@@ -239,7 +234,7 @@ module mcu_soc import mcu_soc_pkg::*; #(
   dm_obi_top #(
     .NrHarts  (1),
     .BusWidth (DataWidth),
-    .IdWidth  (SbrObiCfg.IdWidth)
+    .IdWidth  (xbar_cfg.IdWidth + 2)
   ) dm_obi_top_inst (
     .clk_i       (clk),
     .rst_ni      (rstn),
@@ -251,26 +246,26 @@ module mcu_soc import mcu_soc_pkg::*; #(
     .unavailable_i (1'b0),
     .hartinfo_i    (hartinfo),
 
-    .slave_req_i       (xbar_obi_sub_req.req),
-    .slave_we_i        (xbar_obi_sub_req.a.we),
-    .slave_addr_i      (xbar_obi_sub_req.a.addr),
-    .slave_be_i        (xbar_obi_sub_req.a.be),
-    .slave_wdata_i     (xbar_obi_sub_req.a.wdata),
-    .slave_aid_i       (xbar_obi_sub_req.a.aid),
-    .slave_gnt_o       (xbar_obi_sub_rsp.gnt),
-    .slave_rvalid_o    (xbar_obi_sub_rsp.rvalid),
-    .slave_rdata_o     (xbar_obi_sub_rsp.r.rdata),
-    .slave_rid_o       (xbar_obi_sub_rsp.r.rid),
+    .slave_req_i       (obi_a_chans_sub[XbarSbrDbg].obi_areq),
+    .slave_we_i        (obi_a_chans_sub[XbarSbrDbg].obi_awe),
+    .slave_addr_i      (obi_a_chans_sub[XbarSbrDbg].obi_aadr),
+    .slave_be_i        (obi_a_chans_sub[XbarSbrDbg].obi_abe),
+    .slave_wdata_i     (obi_a_chans_sub[XbarSbrDbg].obi_awdata),
+    .slave_aid_i       (obi_a_chans_sub[XbarSbrDbg].obi_aid),
+    .slave_gnt_o       (obi_agnt_signals_sub[XbarSbrDbg]),
+    .slave_rvalid_o    (obi_r_chans_sub[XbarSbrDbg].obi_rvalid),
+    .slave_rdata_o     (obi_r_chans_sub[XbarSbrDbg].obi_rdata),
+    .slave_rid_o       (obi_r_chans_sub[XbarSbrDbg].obi_rid),
 
-    .master_req_o      (dbg_obi_man_req.req),
-    .master_addr_o     (dbg_obi_man_req.a.addr),
-    .master_we_o       (dbg_obi_man_req.a.we),
-    .master_be_o       (dbg_obi_man_req.a.be),
-    .master_wdata_o    (dbg_obi_man_req.a.wdata),
-    .master_gnt_i      (dbg_obi_man_rsp.gnt),
-    .master_rvalid_i   (dbg_obi_man_rsp.rvalid),
-    .master_rdata_i    (dbg_obi_man_rsp.r.rdata),
-    .master_err_i      (dbg_obi_man_rsp.r.err),
+    .master_req_o      (obi_a_chans_mgr[XbarMgrDbg].obi_areq),
+    .master_addr_o     (obi_a_chans_mgr[XbarMgrDbg].obi_aadr),
+    .master_we_o       (obi_a_chans_mgr[XbarMgrDbg].obi_awe),
+    .master_be_o       (obi_a_chans_mgr[XbarMgrDbg].obi_abe),
+    .master_wdata_o    (obi_a_chans_mgr[XbarMgrDbg].obi_awdata),
+    .master_gnt_i      (obi_agnt_signals_mgr[XbarMgrDbg]),
+    .master_rvalid_i   (obi_r_chans_mgr[XbarMgrDbg].obi_rvalid),
+    .master_rdata_i    (obi_r_chans_mgr[XbarMgrDbg].obi_rdata),
+    .master_err_i      (obi_r_chans_mgr[XbarMgrDbg].obi_rerr),
     .master_other_err_i(1'b0),
 
     .dmi_rst_ni        (dmi_rst_n),
@@ -287,17 +282,17 @@ module mcu_soc import mcu_soc_pkg::*; #(
     .clk_i  (clk),
     .rstn_i (rstn),
 
-    .obi_areq_i  (xbar_uart_obi_req.req),
-    .obi_agnt_o  (xbar_uart_obi_rsp.gnt),
-    .obi_aaddr_i (xbar_uart_obi_req.a.addr),
-    .obi_awdata_i(xbar_uart_obi_req.a.wdata),
-    .obi_awe_i   (xbar_uart_obi_req.a.we) ,
-    .obi_abe_i   (xbar_uart_obi_req.a.be),
+    .obi_areq_i  (obi_a_chans_sub[XbarSbrUart].obi_areq),
+    .obi_agnt_o  (obi_agnt_signals_sub[XbarSbrUart]),
+    .obi_aaddr_i (obi_a_chans_sub[XbarSbrUart].obi_aadr),
+    .obi_awdata_i(obi_a_chans_sub[XbarSbrUart].obi_awdata),
+    .obi_awe_i   (obi_a_chans_sub[XbarSbrUart].obi_awe) ,
+    .obi_abe_i   (obi_a_chans_sub[XbarSbrUart].obi_abe),
 
-    .obi_rvalid_o(xbar_uart_obi_rsp.rvalid),
-    .obi_rready_i(xbar_uart_obi_req.rready),
-    .obi_rdata_o (xbar_uart_obi_rsp.r.rdata),
-    .obi_rerr_o  (xbar_uart_obi_rsp.r.err),
+    .obi_rvalid_o(obi_r_chans_sub[XbarSbrUart].obi_rvalid),
+    .obi_rready_i(obi_rready_signals_sub[XbarSbrUart]),
+    .obi_rdata_o (obi_r_chans_sub[XbarSbrUart].obi_rdata),
+    .obi_rerr_o  (obi_r_chans_sub[XbarSbrUart].obi_rerr),
 
     .tx_o        (tx)
   );
@@ -310,16 +305,17 @@ module mcu_soc import mcu_soc_pkg::*; #(
    ) u_obi_gpio (
        .clk_i       (clk),
        .rstn_i      (rstn),
-       .obi_areq_i  (xbar_gpio_obi_req.req),
-       .obi_agnt_o  (xbar_gpio_obi_rsp.gnt),
-       .obi_aaddr_i (xbar_gpio_obi_req.a.addr),
-       .obi_awdata_i(xbar_gpio_obi_req.a.wdata),
-       .obi_awe_i   (xbar_gpio_obi_req.a.we),
-       .obi_abe_i   (xbar_gpio_obi_req.a.be),
-       .obi_rvalid_o(xbar_gpio_obi_rsp.rvalid),
-       .obi_rready_i(xbar_gpio_obi_req.rready),
-       .obi_rdata_o (xbar_gpio_obi_rsp.r.rdata),
-       .obi_rerr_o  (xbar_gpio_obi_rsp.r.err),
+       .obi_areq_i  (obi_a_chans_sub[XbarSbrGpio].obi_areq),
+       .obi_agnt_o  (obi_agnt_signals_sub[XbarSbrGpio]),
+       .obi_aaddr_i (obi_a_chans_sub[XbarSbrGpio].obi_aadr),
+       .obi_awdata_i(obi_a_chans_sub[XbarSbrGpio].obi_awdata),
+       .obi_awe_i   (obi_a_chans_sub[XbarSbrGpio].obi_awe) ,
+       .obi_abe_i   (obi_a_chans_sub[XbarSbrGpio].obi_abe),
+
+       .obi_rvalid_o(obi_r_chans_sub[XbarSbrGpio].obi_rvalid),
+       .obi_rready_i(obi_rready_signals_sub[XbarSbrGpio]),
+       .obi_rdata_o (obi_r_chans_sub[XbarSbrGpio].obi_rdata),
+       .obi_rerr_o  (obi_r_chans_sub[XbarSbrGpio].obi_rerr),
        .gpio_in_i   (gpio_in_i),
        .gpio_out_o  (gpio_out_o)
    );
@@ -330,16 +326,17 @@ module mcu_soc import mcu_soc_pkg::*; #(
 ) i_obi_timer (
     .clk_i       (clk),
     .rstn_i      (rstn),
-    .obi_areq_i  (xbar_timer_obi_req.req),
-    .obi_agnt_o  (xbar_timer_obi_rsp.gnt),
-    .obi_aaddr_i (xbar_timer_obi_req.a.addr),
-    .obi_awdata_i(xbar_timer_obi_req.a.wdata),
-    .obi_awe_i   (xbar_timer_obi_req.a.we),
-    .obi_abe_i   (xbar_timer_obi_req.a.be),
-    .obi_rvalid_o(xbar_timer_obi_rsp.rvalid),
-    .obi_rready_i(xbar_timer_obi_req.rready),
-    .obi_rdata_o (xbar_timer_obi_rsp.r.rdata),
-    .obi_rerr_o  (xbar_timer_obi_rsp.r.err ),
+    .obi_areq_i  (obi_a_chans_sub[XbarSbrTimer].obi_areq),
+    .obi_agnt_o  (obi_agnt_signals_sub[XbarSbrTimer]),
+    .obi_aaddr_i (obi_a_chans_sub[XbarSbrTimer].obi_aadr),
+    .obi_awdata_i(obi_a_chans_sub[XbarSbrTimer].obi_awdata),
+    .obi_awe_i   (obi_a_chans_sub[XbarSbrTimer].obi_awe) ,
+    .obi_abe_i   (obi_a_chans_sub[XbarSbrTimer].obi_abe),
+
+    .obi_rvalid_o(obi_r_chans_sub[XbarSbrTimer].obi_rvalid),
+    .obi_rready_i(obi_rready_signals_sub[XbarSbrTimer]),
+    .obi_rdata_o (obi_r_chans_sub[XbarSbrTimer].obi_rdata),
+    .obi_rerr_o  (obi_r_chans_sub[XbarSbrTimer].obi_rerr),
     .overflow_o  ()
 );
 
