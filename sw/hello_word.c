@@ -8,18 +8,13 @@
 #include "uart.h"
 #include "print.h"
 #include "config.h"
-
-void sleep(void) {
-    int i;
-    for (i=0; i < SLEEP_CYCLES; i++)
-        asm volatile("nop" ::: "memory");
-}
+#include "sleep.h"
 
 int main() {
     uart_init();
     while (1) {
         printf("Hello World from RVJ1!\n");
-        sleep();
+        sleep(SLEEP_CYCLES);
         uart_write_flush();
     }
     return 0;
