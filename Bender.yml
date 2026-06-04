@@ -8,7 +8,7 @@ dependencies:
   mapped2obi:      { git: "https://github.com/jurevreca12/mapped2obi.git",    rev: 786644b   }
   obi:             { git: "https://github.com/pulp-platform/obi.git",         version: 0.1.7 }
   obi_peripherals: { git: "https://github.com/jurevreca12/obi_peripherals",   rev: 1654d70e  }
-  obi-spi:         { git: "https://github.com/carotium/obi-spi.git",          rev: e8a2f88   }
+  obi-spi:         { git: "https://github.com/carotium/obi-spi.git",          rev: 93ce50f   }
 
 sources:
     - rtl/mcu_soc_pkg.sv

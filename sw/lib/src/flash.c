@@ -11,11 +11,11 @@ uint8_t flash_init() {
 
     spi_unselect();
 
-    for(uint8_t i = 0; i < 8; i++) {
-        if(i == 0) printf("Flash ID: ");
-        printf("%x ", flash_id[i]);
-        if(i == 7) printf("\r\n");
-    }
+    // for(uint8_t i = 0; i < 8; i++) {
+        // if(i == 0) printf("Flash ID: ");
+        // printf("%x ", flash_id[i]);
+        // if(i == 7) printf("\r\n");
+    // }
 
     if(flash_id[0] == 0x20 && flash_id[1] == 0xBA && flash_id[2] == 0x19)
 	    return 0;
@@ -44,12 +44,12 @@ void flash_read_memory(uint32_t start_addr, uint8_t *data, uint32_t num_of_data)
     
     spi_unselect();
 
-    printf("Start address:\r\n%x: ", start_addr);
+    // printf("Start address:\r\n%x: ", start_addr);
 
-    for(uint32_t i = 0; i < num_of_data; i++) {
-        if(i != 0 && i % 8 == 0) printf("\r\n%x: ", start_addr + i);
-        printf("%x ", *(data + i));
-    }
+    // for(uint32_t i = 0; i < num_of_data; i++) {
+        // if(i != 0 && i % 8 == 0) printf("\r\n%x: ", start_addr + i);
+        // printf("%x ", *(data + i));
+    // }
 
-    printf("\r\nEnd of read!\r\n");
+    // printf("\r\nEnd of read!\r\n");
 }
