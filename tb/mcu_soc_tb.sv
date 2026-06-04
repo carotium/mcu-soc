@@ -2,10 +2,11 @@ module mcu_soc_tb #(
   parameter string INIT_FILE="",
   parameter int    INIT_FILE_BIN=0,
   parameter int    MEM_SIZE_WORDS=4096,
-  parameter int    TIMEOUT=100000
+  parameter int    TIMEOUT=1000000
 ) ();
 
-  logic clk, rstn, tx, rx;
+  logic clk, rstn, tx, rx, sclk, mosi, miso, complete;
+  logic [3:0] ss;
   always #1 clk = ~clk;
 
   mcu_soc #(
@@ -16,7 +17,12 @@ module mcu_soc_tb #(
     .clk (clk),
     .rstn(rstn),
     .tx  (tx),
-    .rx  (rx)
+    .rx  (rx),
+    .ss  (ss),
+    .sclk (sclk),
+    .mosi (mosi),
+    .miso (miso),
+    .complete (complete)
   );
 
   assign rx = 1'b0;

@@ -11,10 +11,10 @@ VERILATOR ?= verilator
 
 VERILATOR_ARGS  = --timescale 1ns/1ps --binary -Wno-fatal -Wno-style
 VERILATOR_ARGS += --trace-fst --trace-structs --trace-params -DRVFI
-VERILATOR_ARGS += -GINIT_FILE=\"/foss/designs/mcu-soc//sw/bin/hello_word.hex\"
+VERILATOR_ARGS += -GINIT_FILE=\"/foss/designs/mcu-soc//sw/bin/spi_test.hex\"
 
 MAKEFILE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-SW_HEX_FILE := $(MAKEFILE_DIR)/sw/bin/hello_word.hex
+SW_HEX_FILE := $(MAKEFILE_DIR)/sw/bin/spi_test.hex
 
 mcu_soc.f:
 	$(BENDER) script verilator -t rtl &> mcu_soc.f

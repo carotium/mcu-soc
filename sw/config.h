@@ -12,13 +12,19 @@
 // Address map
 #define BOOTROM_BASE_ADDR   0x80000000
 #define UART_BASE_ADDR      0x60000000
+#define SPI_BASE_ADDR 	    0x40000000
 
 // Frequencies
-#define TB_FREQUENCY        100000000
-#define TB_BAUDRATE         115200
+#define TB_FREQUENCY        20000000
+#define TB_BAUDRATE         9600
 
 // Peripheral configs
 // UART
 #define UART_BYTE_ALIGN     4
 #define UART_FREQ           TB_FREQUENCY
 #define UART_BAUD           TB_BAUDRATE
+
+// SPI
+#define SPI_FREQ	    1000000
+#define CLK_FREQ	    TB_FREQUENCY
+#define SLAVE		    0x1
