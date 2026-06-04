@@ -65,14 +65,14 @@ package mcu_soc_pkg;
         logic                               obi_awe; 
         logic [xbar_cfg.DataWidth/8-1:0]    obi_abe;
         logic [xbar_cfg.DataWidth-1:0]      obi_awdata;
-        logic [(xbar_cfg.IdWidth+2)-1:0]        obi_aid;
+        logic [(xbar_cfg.IdWidth+2)-1:0]    obi_aid;
     } sub_obi_a_t;
 
   typedef struct packed {
         logic                               obi_rvalid;
         logic                               obi_rerr;
         logic [xbar_cfg.DataWidth-1:0]      obi_rdata;
-        logic [(xbar_cfg.IdWidth+2)-1:0]        obi_rid;
+        logic [(xbar_cfg.IdWidth+2)-1:0]    obi_rid;
     } sub_obi_r_t;
   //`TYPEDEF_OBI_CHANS(mgr_obi_a_t, mgr_obi_r_t, obi_pkg::MANAGER, xbar_cfg);
   //`TYPEDEF_OBI_CHANS(sub_obi_a_t, sub_obi_r_t, obi_pkg::SUBORDINATE, xbar_cfg);
