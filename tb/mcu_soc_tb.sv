@@ -4,11 +4,15 @@ module mcu_soc_tb #(
   parameter int    MEM_SIZE_WORDS=4096,
   parameter int    TIMEOUT=100000,
   parameter int    GPIO_NUM_IN=4,
-  parameter int    GPIO_NUM_OUT=4
+  parameter int    GPIO_NUM_OUT=4,
+  parameter int    SPI_NUM_SLAVES = 1
 ) ();
 
   logic clk, rstn, tx;
   logic [GPIO_NUM_OUT-1:0] gpio_out;
+  logic [SPI_NUM_SLAVES-1:0] spi_ss_o;
+  logic spi_sclk_o, spi_mosi_o;
+
   always #5 clk = ~clk;
 
   mcu_soc #(
@@ -27,7 +31,11 @@ module mcu_soc_tb #(
     .jtag_trstn_i (1'b1),
     .tx           (tx),
     .gpio_in_i    (4'b0000),
-    .gpio_out_o   (gpio_out)
+    .gpio_out_o   (gpio_out),
+    .spi_ss_o     (spi_ss_o),
+    .spi_sclk_o   (spi_sclk_o),
+    .spi_mosi_o   (spi_mosi_o),
+    .spi_miso_i   (1'b0)
   );
 
   initial begin

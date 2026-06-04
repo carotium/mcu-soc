@@ -2,7 +2,7 @@
 package mcu_soc_pkg;
   `include "obi_typedef.svh"
 
-  localparam logic [31:0] McuBootAddr     = 32'h8000_0000;
+  localparam logic [31:0] McuBootAddr     = 32'h1000_0000;
   localparam logic [31:0] McuDmRomAddr    = 32'h0000_0800;
   localparam logic [6:0]  MVendorIdOffset = 7'h2;
   localparam logic [24:0] MVendorIdBank   = 25'hC;
@@ -14,15 +14,27 @@ package mcu_soc_pkg;
   localparam int unsigned DataWidth       = 32;
   localparam int unsigned IdWidth         = 4;
 
+  localparam dm::hartinfo_t HartInfo = '{
+    zero0: '0,
+    zero1: '0,
+    nscratch: 2,
+    dataaccess: 1'b1,
+    datasize: dm::DataCount,
+    dataaddr: dm::DataAddr
+  };
+  
+
   localparam int unsigned NumManagers     = 3;
-  localparam int unsigned NumSubordinates = 5;
+  localparam int unsigned NumSubordinates = 7;
 
   typedef enum int {
     XbarSbrMem   = 0,
     XbarSbrUart  = 1,
     XbarSbrGpio  = 2,
     XbarSbrTimer = 3,
-    XbarSbrDbg   = 4
+    XbarSbrSpi   = 4,
+    XbarSbrBoot  = 5,
+    XbarSbrDbg   = 6
   } xbar_sub_e;
 
   typedef enum int {
@@ -35,8 +47,8 @@ package mcu_soc_pkg;
   // Xbar & Obi config
   localparam obi_pkg::xbar_cfg_t xbar_cfg = obi_pkg::xbar_default_cfg(NumManagers, NumSubordinates, AddrWidth, DataWidth, IdWidth);
 
-  localparam bit unsigned [xbar_cfg.Subordinates-1:0] UseSrFifoMask = 5'b01110;
-  localparam int unsigned SrFifoDepth [xbar_cfg.Subordinates] = '{0, 4, 4, 4, 0};
+  localparam bit unsigned [xbar_cfg.Subordinates-1:0] UseSrFifoMask = 7'b0001110;
+  localparam int unsigned SrFifoDepth [xbar_cfg.Subordinates] = '{0, 0, 0, 4, 4, 4, 0};
 
   typedef struct packed {
         logic [xbar_cfg.IdWidth-1:0]          obi_aid;
@@ -87,7 +99,7 @@ package mcu_soc_pkg;
       '{idx: XbarSbrDbg,   base: 32'h0000_0000, mask: 32'hfff4_0000}
   };*/
 
-  `TYPEDEF_XBAR_CONNECTIVITY(Connectivity, NumSubordinates, NumManagers, {{5'b11111}, {5'b11111}, {5'b11111}});
+  `TYPEDEF_XBAR_CONNECTIVITY(Connectivity, NumSubordinates, NumManagers, {{7'b1111111}, {7'b1111111}, {7'b1111111}});
 
   typedef struct packed {
     bit [ 3:0] version;
