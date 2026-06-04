@@ -19,7 +19,7 @@ module mcu_soc import mcu_soc_pkg::*; #(
 
   input  logic [GPIO_NUM_IN-1:0]  gpio_in_i,
   output logic [GPIO_NUM_OUT-1:0] gpio_out_o,
-  
+
 
   output  logic [SPI_NUM_SLAVES-1 : 0]  spi_ss_o,
   output  logic                         spi_sclk_o,
