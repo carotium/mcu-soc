@@ -4,7 +4,7 @@ package:
     - "Jure Vreča <jure.vreca@ijs.si>"
 
 dependencies:
-  std-lib:         { git: "https://github.com/jurevreca12/std-lib.git",         rev: fdde208   }
+  std-lib:         { git: "https://github.com/jurevreca12/std-lib.git",         rev: f427415   }
   rvj1:            { git: "https://github.com/jurevreca12/rvj1.git",            rev: 75da4ea   }
   obi:             { git: "https://github.com/Kristjan42/obi.git",              rev: 7c895da   }
   riscv-dbg:       { git: "https://github.com/pulp-platform/riscv-dbg.git",     rev: 1cd764a   }
@@ -19,6 +19,7 @@ sources:
     - rtl/obi_ram.sv
     - rtl/mcu_soc.sv
     - tb/mcu_soc_tb.sv
+    - tb/mcu_soc_jtag_tb.sv
 
     - target: xilinx
       files:

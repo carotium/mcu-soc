@@ -7,7 +7,7 @@ module mcu_soc_xilinx import mcu_soc_pkg::*; #(
   parameter  int    SPI_NUM_SLAVES=1
   ) (
   input  logic clk,
-  input  logic rstn,
+  input  logic rst,
 
   output logic tx,
 
@@ -35,7 +35,7 @@ module mcu_soc_xilinx import mcu_soc_pkg::*; #(
     .SPI_NUM_SLAVES(SPI_NUM_SLAVES)
   ) mcu1 (
     .clk         (clk),
-    .rstn        (rstn),
+    .rstn        (~rst),
     .jtag_tck_i  (),
     .jtag_tdi_i  (),
     .jtag_tdo_o  (),
@@ -54,7 +54,6 @@ module mcu_soc_xilinx import mcu_soc_pkg::*; #(
   assign spi_wpn_o  = 1'b1;
   assign spi_hldn_o = 1'b1;
 
-  assign test_o = spi_ss_o;
 
 
 endmodule

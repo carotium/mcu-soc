@@ -47,8 +47,8 @@ package mcu_soc_pkg;
   // Xbar & Obi config
   localparam obi_pkg::xbar_cfg_t xbar_cfg = obi_pkg::xbar_default_cfg(NumManagers, NumSubordinates, AddrWidth, DataWidth, IdWidth);
 
-  localparam bit unsigned [xbar_cfg.Subordinates-1:0] UseSrFifoMask = 7'b0111110;
-  localparam int unsigned SrFifoDepth [xbar_cfg.Subordinates] = '{0, 4, 4, 4, 4, 4, 0};
+  localparam bit unsigned [xbar_cfg.Subordinates-1:0] UseSrFifoMask = 7'b1111110;
+  localparam int unsigned SrFifoDepth [xbar_cfg.Subordinates] = '{4, 4, 4, 4, 4, 4, 0};
 
   typedef struct packed {
         logic [xbar_cfg.IdWidth-1:0]          obi_aid;

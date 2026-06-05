@@ -60,6 +60,9 @@ module mcu_soc import mcu_soc_pkg::*; #(
   logic                 obi_data_rerr;
 
   logic                 debug_req;
+  logic                 ndmreset;
+  logic                 hwsw_rstn;
+
   logic                 dmi_rst_n;
   logic                 dmi_req_valid;
   logic                 dmi_req_ready;
@@ -69,6 +72,8 @@ module mcu_soc import mcu_soc_pkg::*; #(
   dm::dmi_resp_t        dmi_resp;
 
   dm::hartinfo_t hartinfo = HartInfo;
+
+  assign hwsw_rstn = rstn && ~ndmreset;
 
   mgr_obi_a_t obi_a_chans_mgr        [NumManagers];
   logic       obi_agnt_signals_mgr   [NumManagers];
@@ -98,7 +103,7 @@ module mcu_soc import mcu_soc_pkg::*; #(
     .MHartId  (McuMHartId)
   ) rvj1_inst (
     .clk_i          (clk),
-    .rstn_i         (rstn),
+    .rstn_i         (hwsw_rstn),
 
     .instr_aid_o    (obi_instr_aid),
     .instr_areq_o   (obi_instr_areq),
@@ -180,7 +185,7 @@ module mcu_soc import mcu_soc_pkg::*; #(
     .CONNECTIVITY(Connectivity)
   ) xbar (
     .clk_i            (clk),
-    .rstn_i           (rstn),
+    .rstn_i           (hwsw_rstn),
 
     .mgr_obi_a_chans       (obi_a_chans_mgr),
     .mgr_obi_agnt_signals  (obi_agnt_signals_mgr),
@@ -202,7 +207,7 @@ module mcu_soc import mcu_soc_pkg::*; #(
     .IDLEN         (xbar_cfg.IdWidth + 2)
   ) mem (
     .clk_i  (clk),
-    .rstn_i (rstn),
+    .rstn_i (hwsw_rstn),
 
     .obi_aid_i    (obi_a_chans_sub[XbarSbrMem].obi_aid),
     .obi_areq_i   (obi_a_chans_sub[XbarSbrMem].obi_areq),
@@ -291,7 +296,7 @@ module mcu_soc import mcu_soc_pkg::*; #(
 
   obi_uart obi_uart_inst (
     .clk_i  (clk),
-    .rstn_i (rstn),
+    .rstn_i (hwsw_rstn),
 
     .obi_areq_i  (obi_a_chans_sub[XbarSbrUart].obi_areq),
     .obi_agnt_o  (obi_agnt_signals_sub[XbarSbrUart]),
@@ -315,7 +320,7 @@ module mcu_soc import mcu_soc_pkg::*; #(
        .NUM_OUT(GPIO_NUM_OUT)
    ) obi_gpio_inst (
        .clk_i       (clk),
-       .rstn_i      (rstn),
+       .rstn_i      (hwsw_rstn),
        .obi_areq_i  (obi_a_chans_sub[XbarSbrGpio].obi_areq),
        .obi_agnt_o  (obi_agnt_signals_sub[XbarSbrGpio]),
        .obi_aaddr_i (obi_a_chans_sub[XbarSbrGpio].obi_aadr),
@@ -336,7 +341,7 @@ module mcu_soc import mcu_soc_pkg::*; #(
     .DATA_WIDTH(32)
    ) obi_timer_inst (
     .clk_i       (clk),
-    .rstn_i      (rstn),
+    .rstn_i      (hwsw_rstn),
     .obi_areq_i  (obi_a_chans_sub[XbarSbrTimer].obi_areq),
     .obi_agnt_o  (obi_agnt_signals_sub[XbarSbrTimer]),
     .obi_aaddr_i (obi_a_chans_sub[XbarSbrTimer].obi_aadr),
@@ -355,7 +360,7 @@ obi_spi #(
   .NUM_SLAVES (SPI_NUM_SLAVES)
 ) obi_spi_inst (
   .clk_i        (clk),
-  .rstn_i       (rstn),
+  .rstn_i       (hwsw_rstn),
 
   .obi_areq_i   (obi_a_chans_sub[XbarSbrSpi].obi_areq),
   .obi_agnt_o   (obi_agnt_signals_sub[XbarSbrSpi]),
@@ -379,7 +384,7 @@ obi_spi #(
 
 obi_rom obi_rom_inst (
   .clk_i        (clk),
-  .rstn_i       (rstn),
+  .rstn_i       (hwsw_rstn),
 
   .obi_areq_i   (obi_a_chans_sub[XbarSbrBoot].obi_areq),
   .obi_agnt_o   (obi_agnt_signals_sub[XbarSbrBoot]),
