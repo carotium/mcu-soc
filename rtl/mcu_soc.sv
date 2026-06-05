@@ -255,7 +255,7 @@ module mcu_soc import mcu_soc_pkg::*; #(
     .clk_i       (clk),
     .rst_ni      (rstn),
     .testmode_i  (1'b0),
-    .ndmreset_o  (),
+    .ndmreset_o  (ndmreset),
     .dmactive_o  (),
 
     .debug_req_o   (debug_req),
