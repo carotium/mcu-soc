@@ -8,12 +8,13 @@ dependencies:
   mapped2obi:      { git: "https://github.com/jurevreca12/mapped2obi.git",    rev: 786644b   }
   obi:             { git: "https://github.com/pulp-platform/obi.git",         version: 0.1.7 }
   obi_peripherals: { git: "https://github.com/jurevreca12/obi_peripherals",   rev: 1654d70e  }
-  obi-spi:         { git: "https://github.com/carotium/obi-spi.git",          rev: 93ce50f   }
+  obi-spi:         { git: "https://github.com/carotium/obi-spi.git",          rev: ff75685   }
 
 sources:
     - rtl/mcu_soc_pkg.sv
     - rtl/obi_ram.sv
     - rtl/mcu_soc.sv
+    - rtl/mcmme2_base_clkgen.sv
     - tb/mcu_soc_tb.sv
 
     - target: xilinx

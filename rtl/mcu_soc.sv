@@ -311,12 +311,8 @@ module mcu_soc import mcu_soc_pkg::*; #(
   );
 
   obi_spi #(
-    .BASE_ADDR		(32'h4000_0000),
-    .ADDR_WIDTH		(AddrWidth),
-    .DATA_WIDTH		(DataWidth),
     .NUM_SLAVES		(4),
-    .SCLK_COUNTER_RESET_VALUE	(0),
-    .SPI_DATA_LENGTH		(8)
+    .SCLK_COUNTER_RESET_VALUE	(0)
   ) spi_flash (
     .clk_i	(clk),
     .rstn_i	(rstn),
