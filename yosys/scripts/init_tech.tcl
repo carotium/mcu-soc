@@ -7,7 +7,7 @@
 
 # All paths relative to yosys/
 
-puts "0. Executing init_tech: load technology from Github PDK"
+puts "0. Executing init_tech: load technology from PDK"
 puts "PDK_ROOT=$env(PDK_ROOT)"
 if {![info exists pdk_dir]} {
 	set pdk_dir $env(PDK_ROOT)

@@ -11,6 +11,9 @@
 # This file is sourced by all scripts to set up tool paths and PDK location
 
 # Determine repository root
+
+#export PDK_ROOT="$(PDK_ROOT)"
+
 if [[ -n "${BASH_SOURCE[0]}" ]]; then
     export MCU_ROOT=$(realpath $(dirname "${BASH_SOURCE[0]}"))
 else
