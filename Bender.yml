@@ -13,7 +13,7 @@ dependencies:
   obi_uart:        { git: "https://github.com/RatkoFri/obi_uart.git",           rev: 8c13903   }
   obi-spi:         { git: "https://github.com/carotium/obi-spi.git",            rev: 98ddb8d   }
   obi-rom:         { git: "https://github.com/jurevreca12/boot-rom.git",        rev: 76b2586   }
-  sram_impl:       { git: "https://github.com/carotium/sram_impl.git",          rev: bb32350   }
+  sram_impl:       { git: "https://github.com/carotium/sram_impl.git",          rev: 3687493   }
 
 sources:
     - rtl/mcu_soc_pkg.sv
