@@ -15,7 +15,7 @@ VERILATOR_ARGS += --trace-fst --trace-structs --trace-params -DRVFI
 VERILATOR_ARGS += -GINIT_FILE=\"/foss/designs/mcu-soc//sw/bin/gpio.hex\"
 
 MAKEFILE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-SW_HEX_FILE := $(MAKEFILE_DIR)/sw/bin/hello_word.hex
+SW_HEX_FILE := $(MAKEFILE_DIR)/sw/bin/bootloader.hex
 
 RV_DBG_PATH := $(shell bender path riscv-dbg)
 REMOTE_BITBANG_PATH := $(RV_DBG_PATH)/tb/remote_bitbang/

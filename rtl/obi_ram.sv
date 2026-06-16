@@ -4,7 +4,7 @@ module obi_ram #(
   parameter  int    DATA_WIDTH=32,
   parameter  int    ADDR_WIDTH=32,
   parameter  int    IDLEN=4,
-  parameter  int    MEM_SIZE_WORDS,
+  parameter  int    MEM_SIZE_WORDS=2**12,
   localparam int    NBytes=(DATA_WIDTH / 8),
   localparam int    MemAddrWidth=$clog2(MEM_SIZE_WORDS)
 ) (
@@ -73,7 +73,7 @@ module obi_ram #(
   assign act_req_ready = !(rsp_buff_almost_full || rsp_buff_full);
   assign act_req_fire = act_req_valid && act_req_ready;
 
-  bytewrite_sram #(
+  sram_impl #(
     .WORD_SIZE      (DATA_WIDTH),
     .MEM_INIT_FILE  (INIT_FILE),
     .INIT_FILE_BIN  (INIT_FILE_BIN),
@@ -87,6 +87,21 @@ module obi_ram #(
     .din    (act_req.data),
     .dout   (mem_data)
   );
+
+  // bytewrite_sram #(
+  //   .WORD_SIZE      (DATA_WIDTH),
+  //   .MEM_INIT_FILE  (INIT_FILE),
+  //   .INIT_FILE_BIN  (INIT_FILE_BIN),
+  //   .MEM_SIZE_WORDS (MEM_SIZE_WORDS)
+  // ) mem (
+  //   .clk    (clk_i),
+  //   .strobe (act_req.strobe),
+  //   .write  (act_req.write),
+  //   .valid  (act_req_fire),
+  //   .addr   (act_req.addr),
+  //   .din    (act_req.data),
+  //   .dout   (mem_data)
+  // );
 
   register req_fire_reg (
     .clk(clk_i), .rstn(rstn_i), .ce(1'b1),         .in(act_req_fire),     .out(act_req_fire_r)
