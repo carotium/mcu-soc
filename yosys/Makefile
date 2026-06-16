@@ -1,3 +1,3 @@
 yosys:
-	./run_synthesys --flist
-	./run_synthesys --synth
+	./run_synthesis.sh --flist
+	./run_synthesis.sh --synth
