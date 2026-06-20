@@ -20,9 +20,13 @@ set pdk_sram_lef  ${pdk_dir}/ihp-sg13g2/libs.ref/sg13g2_sram/lef
 set pdk_io_lib    ${pdk_dir}/ihp-sg13g2/libs.ref/sg13g2_io/lib
 set pdk_io_lef    ${pdk_dir}/ihp-sg13g2/libs.ref/sg13g2_io/lef
 
-#set pdk_pad_lef   ${pdk_dir}/bondpad/lef
 
-# LIB
+if {![info exists mcu_dir]} {
+	set mcu_dir $env(MCU_ROOT)
+}
+set pdk_pad_lef $mcu_dir/pdks/bondpad/lef
+puts "PDK cells lib: $pdk_pad_lef"
+
 define_corners tt ff
 
 puts "Init standard cells"
@@ -48,7 +52,9 @@ read_lef ${pdk_cells_lef}/sg13g2_tech.lef
 puts "Init cell-lef"
 read_lef ${pdk_cells_lef}/sg13g2_stdcell.lef
 read_lef ${pdk_io_lef}/sg13g2_io.lef
-#read_lef ${pdk_pad_lef}/bondpad_70x70.lef
+puts "Init pad-lef"
+puts "reading files from $pdk_pad_lef"
+read_lef ${pdk_pad_lef}/bondpad_70x70.lef
 
 foreach file [glob -directory $pdk_sram_lef RM_IHPSG13*.lef] {
 	read_lef "$file"

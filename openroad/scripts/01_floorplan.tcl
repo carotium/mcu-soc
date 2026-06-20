@@ -93,9 +93,13 @@ source src/padring.tcl
 ##########################################################################
 # RAM sizes
 ##########################################################################
-set RamMaster256x64   [[ord::get_db] findMaster "RM_IHPSG13_1P_256x64_c2_bm_bist"]
-set RamSize256x64_W   [ord::dbu_to_microns [$RamMaster256x64 getWidth]]
-set RamSize256x64_H   [ord::dbu_to_microns [$RamMaster256x64 getHeight]]
+# look up YOUR macro
+set RamMaster   [[ord::get_db] findMaster "RM_IHPSG13_1P_2048x64_c2_bm_bist"]
+set RamSize_W   [ord::dbu_to_microns [$RamMaster getWidth]]
+set RamSize_H   [ord::dbu_to_microns [$RamMaster getHeight]]
+
+
+
 
 
 ##########################################################################
@@ -141,14 +145,10 @@ set floor_midpointY   [expr $floor_bottomY + ($floor_topY - $floor_bottomY)/2]
 utl::report "Place Macros"
 
 # Bank0
-set X [expr $floor_midpointX - $RamSize256x64_W/2]
-set Y [expr $floor_topY - $RamSize256x64_H]
+set X [expr $floor_midpointX - $RamSize_W/2]
+set Y [expr $floor_topY - $RamSize_H]
 placeInstance $bank0_sram0 $X $Y R0
 
-# Bank1
-set X [expr $X]
-set Y [expr $floor_bottomY]
-placeInstance $bank1_sram0 $X $Y MX
 
 # defined in init_tech.tcl
 insertTapCells
