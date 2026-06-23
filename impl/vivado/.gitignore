@@ -6,3 +6,4 @@ vivado*.jou
 clockInfo.txt
 xvlog.pb
 xvlog.log
+tight_setup_hold_pins.txt

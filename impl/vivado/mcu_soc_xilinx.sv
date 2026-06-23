@@ -6,8 +6,10 @@ module mcu_soc_xilinx import mcu_soc_pkg::*; #(
   parameter  int    GPIO_NUM_OUT=4,
   parameter  int    SPI_NUM_SLAVES=1
   ) (
-  input  logic clk,
-  input  logic rst,
+  input logic diff_clk_p,
+  input logic diff_clk_n,
+//  input  logic clk,
+  input  logic rstn,
 
   output logic tx,
 
@@ -26,6 +28,38 @@ module mcu_soc_xilinx import mcu_soc_pkg::*; #(
 
   output  logic                         test_o
 );
+
+  logic clk;
+  logic clk_20M;
+  logic rstn_o;
+
+  assign spi_resetn = '1;
+  assign spi_holdn = '1;
+  assign spi_writeprotectn = '1;
+
+  IBUFGDS #(
+    .DIFF_TERM("FALSE"),
+    .IBUF_LOW_PWR("TRUE"),
+    .IOSTANDARD("DEFAULT")
+    ) IBUFGDS_inst (
+       .O(clk),
+        .I(diff_clk_p),
+        .IB(diff_clk_n)
+        );
+
+  (* blackbox *)
+  mcmme2_base_clkgen #(
+    //.INPUT_FREQUENCY_MHZ(200),
+    //.DIVCLK_DIVIDE(4),  // set clock to 50 MHz
+    //.CLKFBOUT_MULT(17)
+  ) clkgen_inst (
+    .sys_clk_pad_i(clk),
+    .rst_pad_i    (~rstn),
+    .async_rstn_o (),
+    .clk_o        (clk_20M),
+    .rstn_o       (rstn_o)
+  );
+
   mcu_soc #(
     .INIT_FILE     (INIT_FILE),
     .INIT_FILE_BIN (INIT_FILE_BIN),
