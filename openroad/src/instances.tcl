@@ -30,10 +30,12 @@ proc check_handle {name val} {
 #   RM_IHPSG13_1P_2048x64_c2_bm_bist  (2048 x 64 = 16 KiB)
 # Look it up by master (unambiguous) and store its full NAME string, which is
 # what placeInstance expects.
-set _sram_cells [get_cells -hier -filter "ref_name == RM_IHPSG13_1P_2048x64_c2_bm_bist"]
+#set _sram_cells [get_cells -hier -filter "ref_name == RM_IHPSG13_1P_2048x64_c2_bm_bist"]
+set _sram_cells [get_cells -hier -filter "ref_name == RM_IHPSG13_1P_512x64_c2_bm_bist"]
 
 if {[llength $_sram_cells] == 0} {
-    utl::warn FLW 9002 "No RM_IHPSG13_1P_2048x64 macro found - check the netlist/top."
+    #utl::warn FLW 9002 "No RM_IHPSG13_1P_2048x64 macro found - check the netlist/top."
+    utl::warn FLW 9002 "No RM_IHPSG13_1P_512x64 macro found - check the netlist/top."
     set bank0_sram0 ""
 } else {
     set bank0_sram0 [get_full_name [lindex $_sram_cells 0]]

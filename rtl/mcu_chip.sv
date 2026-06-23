@@ -119,7 +119,8 @@ module mcu_chip (
 
   // ---- Core ----
   mcu_soc #(
-    .MEM_SIZE_WORDS (4096),
+    //.MEM_SIZE_WORDS (4096),
+    .MEM_SIZE_WORDS (1024),
     .GPIO_NUM_IN    (4),
     .GPIO_NUM_OUT   (4),
     .SPI_NUM_SLAVES (1)

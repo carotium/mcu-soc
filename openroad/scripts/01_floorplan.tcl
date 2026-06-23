@@ -94,7 +94,8 @@ source src/padring.tcl
 # RAM sizes
 ##########################################################################
 # look up YOUR macro
-set RamMaster   [[ord::get_db] findMaster "RM_IHPSG13_1P_2048x64_c2_bm_bist"]
+#set RamMaster   [[ord::get_db] findMaster "RM_IHPSG13_1P_2048x64_c2_bm_bist"]
+set RamMaster   [[ord::get_db] findMaster "RM_IHPSG13_1P_512x64_c2_bm_bist"]
 set RamSize_W   [ord::dbu_to_microns [$RamMaster getWidth]]
 set RamSize_H   [ord::dbu_to_microns [$RamMaster getHeight]]
 

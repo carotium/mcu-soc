@@ -12,7 +12,7 @@
 
 # Determine repository root
 
-#export PDK_ROOT="$(PDK_ROOT)"
+#export PDK_ROOT="$env(PDK_ROOT)"
 
 if [[ -n "${BASH_SOURCE[0]}" ]]; then
     export MCU_ROOT=$(realpath $(dirname "${BASH_SOURCE[0]}"))
@@ -27,7 +27,7 @@ echo "[INFO][ENV] MCU root: $MCU_ROOT"
 ######################
 export PROJ_NAME="${PROJ_NAME:-mcu-soc}"
 export DUT_DESIGN="${DUT_DESIGN:-mcu_soc}"
-export PDK_ROOT="$MCU_ROOT/pdks/ihp13/pdk/"
+#export PDK_ROOT="$MCU_ROOT/pdks/ihp13/pdk/"
 export KLAYOUT_PATH="$PDK_ROOT/ihp-sg13g2/libs.tech/klayout"
 export PDK_DIR_LEF_TECH="$PDK_ROOT/ihp-sg13g2/libs.ref/sg13g2_stdcell/lef"
 export PDK_DIR_LEF_CELLS="$PDK_ROOT/ihp-sg13g2/libs.ref/sg13g2_stdcell/lef"

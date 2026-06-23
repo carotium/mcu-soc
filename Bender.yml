@@ -24,6 +24,7 @@ sources:
     - tb/mcu_soc_tb.sv
     - tb/mcu_soc_jtag_tb.sv
     - /foss/pdks/ihp-sg13g2/libs.ref/sg13g2_sram/verilog/RM_IHPSG13_1P_2048x64_c2_bm_bist.v
+    - /foss/pdks/ihp-sg13g2/libs.ref/sg13g2_sram/verilog/RM_IHPSG13_1P_512x64_c2_bm_bist.v
     - /foss/pdks/ihp-sg13g2/libs.ref/sg13g2_sram/verilog/RM_IHPSG13_1P_core_behavioral_bm_bist.v
 
     - target: xilinx
