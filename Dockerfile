@@ -43,4 +43,22 @@ RUN git clone https://github.com/YosysHQ/riscv-formal && \
     sed -i "s/with\sopen(f\"\.\.\/\.\./with open(f\"\/foss\/tools\/riscv-formal/" \
         /foss/tools/riscv-formal/checks/genchecks.py
 
+RUN git clone https://github.com/riscv/riscv-openocd.git && \
+    cd riscv-openocd && \
+    git checkout af3a034b57279d2a400d87e7508c9a92254ec165 && \
+    git submodule update --init --recursive && \
+    sed -i 's/const struct swd_driver bitbang_swd/extern const struct swd_driver bitbang_swd/g' ./src/jtag/drivers/bitbang.h && \
+    ./bootstrap && \
+    ./configure --prefix=/foss/tools/riscv-openocd/ --enable-internal-jimtcl --disable-werror --disable-wextra --enable-remote-bitbang && \
+    make && \
+    make install && \
+    cd .. && \
+    rm -rf riscv-openocd && \
+    ln -s /foss/tools/riscv-openocd/bin/openocd /foss/tools/bin/openocd
+
+RUN apt update && \
+    wget http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2ubuntu0.1_amd64.deb && \
+    sudo apt install ./libtinfo5_6.3-2ubuntu0.1_amd64.deb && \
+    rm ./libtinfo5_6.3-2ubuntu0.1_amd64.deb
+
 WORKDIR /foss/designs/mcu-soc

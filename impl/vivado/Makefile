@@ -20,10 +20,10 @@ sim: ./output/tb.vcd
 	mkdir output
 
 sources_vivado.tcl:
-	bender script vivado -t rtl -t xilinx &> sources_vivado.tcl
+	bender script vivado -t bscane &> sources_vivado.tcl
 
-$(REPORTS) $(NETLISTS) $(BITFILES): $(SVFILES) synth.tcl constr_genesys.xdc ./output/ sources_vivado.tcl
-	vivado -mode batch -source synth.tcl -log ./output/vivado.log -nojournal #&> ./output/vivado2.log
+$(REPORTS) $(NETLISTS) $(BITFILES): $(SVFILES) synth.tcl constr_nexys.xdc ./output/ sources_vivado.tcl
+	LD_PRELOAD=/lib/x86_64-linux-gnu/libudev.so.1 vivado -mode batch -source synth.tcl -log ./output/vivado.log -nojournal #&> ./output/vivado2.log
 
 program: 
 	vivado -mode batch -source prog.tcl

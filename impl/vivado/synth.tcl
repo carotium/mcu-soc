@@ -14,8 +14,7 @@ source ${script_path}/sources_vivado.tcl
 read_xdc $script_path/constr_genesys.xdc
 
 # Run synthesis
-synth_design -top mcu_soc_xilinx 
-#-generic INIT_FILE=${project_root_dir}/sw/bin/spi_test.hex
+synth_design -top mcu_soc_xilinx -generic INIT_FILE=${project_root_dir}/sw/bin/gpio.hex
 report_timing_summary    -file ${output_dir}/post_synth_timing_summary.rpt
 report_power             -file ${output_dir}/post_synth_power.rpt
 report_clock_interaction -file ${output_dir}/post_synth_clock_interaction.rpt -delay_type min_max

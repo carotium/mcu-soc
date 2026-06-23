@@ -2,30 +2,41 @@ module mcu_soc_tb #(
   parameter string INIT_FILE="",
   parameter int    INIT_FILE_BIN=0,
   parameter int    MEM_SIZE_WORDS=4096,
-  parameter int    TIMEOUT=1000000
+  parameter int    TIMEOUT=100000,
+  parameter int    GPIO_NUM_IN=4,
+  parameter int    GPIO_NUM_OUT=4,
+  parameter int    SPI_NUM_SLAVES = 1
 ) ();
 
-  logic clk, rstn, tx, rx, sclk, mosi, miso, complete;
-  logic [3:0] ss;
-  always #1 clk = ~clk;
+  logic clk, rstn, tx;
+  logic [GPIO_NUM_OUT-1:0] gpio_out;
+  logic [SPI_NUM_SLAVES-1:0] spi_ss_o;
+  logic spi_sclk_o, spi_mosi_o;
+
+  always #5 clk = ~clk;
 
   mcu_soc #(
     .INIT_FILE      (INIT_FILE),
     .INIT_FILE_BIN  (INIT_FILE_BIN),
-    .MEM_SIZE_WORDS (MEM_SIZE_WORDS)
+    .MEM_SIZE_WORDS (MEM_SIZE_WORDS),
+    .GPIO_NUM_IN    (GPIO_NUM_IN),
+    .GPIO_NUM_OUT   (GPIO_NUM_OUT)
   ) mcux (
-    .clk (clk),
-    .rstn(rstn),
-    .tx  (tx),
-    .rx  (rx),
-    .ss  (ss),
-    .sclk (sclk),
-    .mosi (mosi),
-    .miso (miso),
-    .complete (complete)
+    .clk          (clk),
+    .rstn         (rstn),
+    .jtag_tck_i   (1'b0),
+    .jtag_tdi_i   (1'b0),
+    .jtag_tdo_o   (),
+    .jtag_tms_i   (1'b0),
+    .jtag_trstn_i (1'b1),
+    .tx           (tx),
+    .gpio_in_i    (4'b0000),
+    .gpio_out_o   (gpio_out),
+    .spi_ss_o     (spi_ss_o),
+    .spi_sclk_o   (spi_sclk_o),
+    .spi_mosi_o   (spi_mosi_o),
+    .spi_miso_i   (1'b0)
   );
-
-  assign rx = 1'b0;
 
   initial begin
   $display("Starting simulation of MCU.");

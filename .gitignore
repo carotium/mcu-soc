@@ -4,3 +4,5 @@ mcu_soc.f
 Bender.lock
 dump.fst
 obj_dir/
+dump_debug.fst
+impl/vivado/tight_setup_hold_pins.txt

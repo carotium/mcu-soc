@@ -4,17 +4,27 @@ package:
     - "Jure Vreča <jure.vreca@ijs.si>"
 
 dependencies:
-  rvj1:            { git: "https://github.com/jurevreca12/rvj1.git",          rev: 6444908   }
-  mapped2obi:      { git: "https://github.com/jurevreca12/mapped2obi.git",    rev: 786644b   }
-  obi:             { git: "https://github.com/pulp-platform/obi.git",         version: 0.1.7 }
-  obi_peripherals: { git: "https://github.com/jurevreca12/obi_peripherals",   rev: 1654d70e  }
-  obi-spi:         { git: "https://github.com/carotium/obi-spi.git",          rev: e8a2f88   }
+  std-lib:         { git: "https://github.com/jurevreca12/std-lib.git",         rev: f427415   }
+  rvj1:            { git: "https://github.com/jurevreca12/rvj1.git",            rev: 75da4ea   }
+  obi:             { git: "https://github.com/Kristjan42/obi.git",              rev: 7c895da   }
+  riscv-dbg:       { git: "https://github.com/pulp-platform/riscv-dbg.git",     rev: 1cd764a   }
+  obi_gpio:        { git: "https://github.com/RatkoFri/obi_gpio.git",           rev: bdd78b5   }
+  obi_timer:       { git: "https://github.com/RatkoFri/obi_timer.git",          rev: 060ba16   }
+  obi_uart:        { git: "https://github.com/RatkoFri/obi_uart.git",           rev: 8c13903   }
+  obi-spi:         { git: "https://github.com/carotium/obi-spi.git",            rev: 590df27   }
+  obi-rom:         { git: "https://github.com/jurevreca12/boot-rom.git",        rev: 413aa2f   }
+  sram_impl:       { git: "https://github.com/carotium/sram_impl.git",          rev: 3687493   }
 
 sources:
     - rtl/mcu_soc_pkg.sv
     - rtl/obi_ram.sv
     - rtl/mcu_soc.sv
+    - rtl/tc_clk.sv
+    - rtl/mcu_chip.sv
     - tb/mcu_soc_tb.sv
+    - tb/mcu_soc_jtag_tb.sv
+    - /foss/pdks/ihp-sg13g2/libs.ref/sg13g2_sram/verilog/RM_IHPSG13_1P_2048x64_c2_bm_bist.v
+    - /foss/pdks/ihp-sg13g2/libs.ref/sg13g2_sram/verilog/RM_IHPSG13_1P_core_behavioral_bm_bist.v
 
     - target: xilinx
       files:
